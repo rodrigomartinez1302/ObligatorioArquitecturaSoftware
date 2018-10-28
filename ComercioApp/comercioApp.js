@@ -33,32 +33,7 @@ app.listen(CONFIG.puerto, function() {
             } 
         });
 
-
-
-
-
-
-
-
-
 /*
-var nuevaCompra=compra.crearCompra(
-    tarjeta.crearTarjeta(1111,'12/10/2018','nombreTitular',1234),
-    direccionEnvio.crearDireccionEnvio('Calle',1234,'Ciudad','Pais',1234),
-    123,'12/12/2018',
-    producto.crearProducto('NombreProducto','Categoria'),1)
-console.log(nuevaCompra);
-
-MongoClient.connect(db.url,(err,database)=>{
-    if(err) return console.log(err)
-    require('./src/Servicios')(app,database);
-    app.listen(port,() => {console.log('Estamos escuhando el puerto '+ port)})
-
-});
-
-
-
-
 let compra = require('./src/Modelo/Compra');
 let mongoose = require('mongoose');
 let tarjeta = require('./src/Modelo/Tarjeta');

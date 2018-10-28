@@ -9,7 +9,6 @@ const CONFIG = require('./src/Config/app');
 
 const compra = compraEsquema.compra;
 
-
 // Express Configuration
 const app = express();
 app.use(bodyParser.json());
