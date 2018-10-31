@@ -5,7 +5,7 @@ module.exports  =  function(app,db) {
   app.post('/Compras',async(req,res)=>{
     await persistencia.guardarCompra(req.body);
     var response=await peticiones.enviarCompraTePagoYa(req,res);
-    console.log(response.data);
+   console.log(response.data);
     res.status(200).send(response.data);
     }); 
     

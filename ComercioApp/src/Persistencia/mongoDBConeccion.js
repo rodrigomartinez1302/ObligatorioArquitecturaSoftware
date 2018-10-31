@@ -23,8 +23,7 @@ exports.guardarCompra =  function(compraAGuardar){
         if (err) {
             throw new handleError('Error al guardar la compra');
         } 
-    });
-    */
+    });*/
 }
 exports.eliminarCompra = function(compraAEliminar){
     compras.deleteOne({ _id: compraAEliminar.params.id }, function (err) {

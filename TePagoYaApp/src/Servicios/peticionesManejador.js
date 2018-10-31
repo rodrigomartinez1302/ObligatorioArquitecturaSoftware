@@ -12,8 +12,10 @@ exports.buscarGatewayPorCategoria = function(categoria){
 */
 exports.enviarCompraGateway = async (req,res) => {
     try {
-        var compraEnviar={monto:req.body.monto,fechaCompra:req.body.fechaCompra};
+        var compraEnviar={monto:req.body.monto,fechaCompra:req.body.fechaCompra,tarjeta:req.body.tarjeta.numero};
+        console.log(compraEnviar);
         var response = await axios.post('http://localhost:10000/Compras',compraEnviar);
+        console.log('ErrorDesues');
         return response;
     }catch (error){
           throw new handleError('Error en la request');
