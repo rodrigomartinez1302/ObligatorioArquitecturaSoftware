@@ -1,7 +1,7 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
-const compraEsquema= require('../Modelo/compraEsquema.js');
-const db = require('../Config/db');
+var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
+var compraEsquema= require('../Modelo/compraEsquema.js');
+var db = require('../Config/db');
 
 mongoose.Promise = global.Promise;
 
@@ -17,10 +17,10 @@ exports.Conectar =   function (){
 
 //Estos dos metodos moverlos a un aquete controlador
 exports.guardarCompra = function(compraAGuardar){
-    const esquemaAuxiliar = new compraEsquema(compraAGuardar);
+   /*var esquemaAuxiliar = new compraEsquema(compraAGuardar);
     esquemaAuxiliar.save(function(error){
         if (error)  throw new handleError('Error al guardar la compra');
-    });
+    });*/
 }
 /*
 exports.cerrarLotes = function(fecha){

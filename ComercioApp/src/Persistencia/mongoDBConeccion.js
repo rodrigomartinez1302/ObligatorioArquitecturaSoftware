@@ -18,8 +18,8 @@ exports.Conectar =   function (){
 }
 
 exports.guardarCompra =  function(compraAGuardar){
-    var esquemaAuxiliar = new compras(compraAGuardar);
-      /* esquemaAuxiliar.save(function(err){
+    /*var esquemaAuxiliar = new compras(compraAGuardar);
+       esquemaAuxiliar.save(function(err){
         if (err) {
             throw new handleError('Error al guardar la compra');
         } 
@@ -29,7 +29,6 @@ exports.guardarCompra =  function(compraAGuardar){
 exports.eliminarCompra = function(compraAEliminar){
     compras.deleteOne({ _id: compraAEliminar.params.id }, function (err) {
         if (err) throw new handleError('No se encontró la compra');
-        //console.log('Compra eliminada');
       });
 }
 exports.guardarGateway = function(gatewayAGuardar){

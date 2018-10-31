@@ -3,22 +3,12 @@ const peticiones= require("../Servicios/peticionesManejador");
 
 module.exports  =  function(app,db) {
   app.post('/Compras',async(req,res)=>{
-    var error=await persistencia.guardarCompra(req.body);
-    
-    await peticiones.enviarCompraTePagoYa(req,res);
-    res.status(200).send(res.body);
+    await persistencia.guardarCompra(req.body);
+    var response=await peticiones.enviarCompraTePagoYa(req,res);
+    console.log(response.data);
+    res.status(200).send(response.data);
     }); 
-    /*
-    async(error) => {
-      if(error){
-        res.status(400).send('Error al realizar la petición');
-      }else{
-        console.log('Entre al else')
-        await peticiones.enviarCompraGateWay(req.body);
-        res.status(201).send(res.op);
-      }  
-    });
-    */
+    
   app.delete("/Compras/:id", async (req, res) => {
       persistencia.eliminarCompra(req,(error)=>{
         if(error){

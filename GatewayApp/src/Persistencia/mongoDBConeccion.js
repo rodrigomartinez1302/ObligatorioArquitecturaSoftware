@@ -17,15 +17,14 @@ exports.Conectar =   function (){
 
 //Estos dos metodos moverlos a un aquete controlador
 exports.guardarCompra = function(compraAGuardar){
+   /* console.log(compraAGuardar);
     const esquemaAuxiliar = new compraEsquema(compraAGuardar);
-    esquemaAuxiliar.save(function(error,respuesta){
-        if (error) {
-            console.log(error);
-        }
-        else{
-            console.log(respuesta);
-        }
+    esquemaAuxiliar.save(function(err){
+        if (err) {
+            throw new handleError('Error al guardar la compra');
+        } 
     });
+    */
 }
 
 exports.cerrarLotes = function(fecha){

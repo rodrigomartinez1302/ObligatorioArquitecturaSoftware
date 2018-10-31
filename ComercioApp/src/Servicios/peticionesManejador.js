@@ -13,8 +13,8 @@ exports.buscarGatewayPorCategoria = function(categoria){
 exports.enviarCompraTePagoYa = async (req,res) => {
     try {
         var response = await axios.post('http://localhost:9000/Compras',req.body);
-        res.status(200).send(JSON.stringify(response.data));
+        return response;
     } catch (error) {
-        res.status(400).send({'Error':'An error has ocurred'});
+        throw new handleError('Error en la request')
     }
-};
+};   

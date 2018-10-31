@@ -61,10 +61,6 @@ app.listen(CONFIG.puerto, function() {
 
 
 
-
-
-
-
 /*
 var nuevaCompra=compra.crearCompra(
     tarjeta.crearTarjeta(1111,'12/10/2018','nombreTitular',1234),

@@ -1,29 +1,19 @@
 var persistencia= require("../Persistencia/mongoDBConeccion");
 var axios = require('axios');
 var https = require('https');
+const peticiones= require("../Servicios/peticionesManejador");
 
 module.exports  = function(app,db) {
-  app.post('/Compras',(req,res)=>{
-    persistencia.guardarCompra(req.body);
-    res.status(200).send(req.body);
+  app.post('/Compras',async(req,res)=>{
+    await persistencia.guardarCompra(req.body);
+    var response=await peticiones.enviarCompraGateway(req,res);
+    console.log(response.data);
+    res.status(200).send(response.data);
   });
   app.delete("/Compras/:id", (req, res) => {
     var id = req.
     res.status(200).send('Compra borrada ${id}');
-  });
-
-  app.get("/Compras", async (req, res) => {
-      try {
-        res.status(201).send('Hola soy Tepagoya');
-
-          //var response = await axios.get('http://localhost:8000/Probar');
-          //res.status(200).send(JSON.stringify(response.data));
-
-      } catch (error) {
-          res.status(400).send({'Error':'An error has ocurred'});
-      }
-  })
-  
+  });  
 };
 
 

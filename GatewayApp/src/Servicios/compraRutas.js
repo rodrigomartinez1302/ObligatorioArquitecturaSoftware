@@ -1,55 +1,49 @@
-const persistencia= require("../Persistencia/mongoDBConeccion");
 const axios = require('axios');
-const https = require('https');
+const persistencia = require('../Persistencia/mongoDBConeccion');
 
-module.exports  = function(app,db) {
-  app.post('/registrarCompra',(req,res)=>{
-    persistencia.guardarCompra(req.body,(err,resultado)=>{
-      if(err){
-        res.status(400).send({'Error':'An error has ocurred'});
-      }else{
-        res.status(200).send(resultado.op);
-      }
-    });
+module.exports = function (app, db) {
+  app.post('/Compras', async (req, res) => {
+    await persistencia.guardarCompra(req.body);
+    // await peticiones.enviarCompraTePagoYa(req,res);
+    // cambiar la respuesta por res.body
+    console.log(req.body);
+    res.status(200).send(req.body);
   });
-  
-  app.get("/Pedro", async (req, res) => {
-      try {
-          const response = await axios.get('http://localhost:8000/Probar');
-          res.status(200).send(JSON.stringify(response.data));
-
-      } catch (error) {
-          res.status(400).send({'Error':'An error has ocurred'});
-      }
-  })
-  
+  app.get('/Pedro', async (req, res) => {
+    try {
+      const response = await axios.get('http://localhost:8000/Probar');
+      res.status(200).send(JSON.stringify(response.data));
+    } catch (error) {
+      res.status(400).send({ Error: 'An error has ocurred' });
+    }
+  });
 };
 
 
-  
 
 
-    /*
+
+/*
     db.collection('Tarjetas').insert(tarjeta,(err,resultado)=>{
        if(err){
         res.send({'Error':'An error has ocurred'});
       }else{
         res.send(resultado.op);
       }
-      
+
   });
 });
 
 };
-   
-  
+
+
       var nuevaCompra=compra.crearCompra(
       tarjeta.crearTarjeta(1111,'12/10/2018','nombreTitular',1234),
       direccionEnvio.crearDireccionEnvio('Calle',1234,'Ciudad','Pais',1234),
       123,'12/12/2018',
       producto.crearProducto('NombreProducto','Categoria'),1)
 
-      
+
       const nuevoMonto= req.
       console.log(nuevoMonto);
       var tarjetaRecibida=crearTarjeta();
