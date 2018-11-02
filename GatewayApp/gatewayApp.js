@@ -1,9 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
 const persistencia = require('./src/Persistencia/mongoDBConeccion');
 const servicios = require('./src/Servicios/compraRutas');
-const axios = require('axios');
 const compraEsquema = require('./src/Modelo/compraEsquema');
 const CONFIG = require('./src/Config/app');
 
@@ -42,13 +40,11 @@ console.log(resultado);
 // }
 
 
-
 try{
-    var conexion= new persistencia.Conectar();
-}catch(error){
- console.log("Error al conectar");   
+    persistencia.Conectar();
+} catch(error){
+    console.log("Error al conectar"); 
 }
-
 app.listen(CONFIG.puerto, function() { 
     console.log('App corriendo'); }).on('error', function(err) { 
         if (err) {
@@ -56,7 +52,7 @@ app.listen(CONFIG.puerto, function() {
             } 
         });
 
-//persistencia.cerrarLotes();
+persistencia.cerrarLotes();
 
 
 /*

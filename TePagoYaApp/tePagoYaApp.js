@@ -21,11 +21,10 @@ var moment = require('moment');
 var config=('.src/config');
 
 try{
-    var conexion= new persistencia.Conectar();
-}catch(error){
- console.log("Error al conectar");   
+    persistencia.Conectar();
+} catch(error){
+    console.log("Error al conectar"); 
 }
-
 app.listen(CONFIG.puerto, function() { 
     console.log('App corriendo'); }).on('error', function(err) { 
         if (err) {

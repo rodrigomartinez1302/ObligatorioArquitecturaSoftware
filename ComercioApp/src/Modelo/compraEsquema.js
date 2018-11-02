@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 
 const compraEsquema = new mongoose.Schema({
-    //_id: {type: String},
     tarjeta:{
         numero : {type: Number, required: true, max: 9999},
         vencimiento : {type: String, required: true},

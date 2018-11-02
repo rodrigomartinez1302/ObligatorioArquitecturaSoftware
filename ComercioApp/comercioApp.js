@@ -17,15 +17,13 @@ const CONFIG = require('./src/Config/app');
 const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-const port=8000;
 servicios(app);
 
 try{
-    var conexion= new persistencia.Conectar();
-}catch(error){
- console.log("Error al conectar");   
+    persistencia.Conectar();
+} catch(error){
+    console.log("Error al conectar"); 
 }
-
 app.listen(CONFIG.puerto, function() { 
     console.log('App corriendo'); }).on('error', function(err) { 
         if (err) {

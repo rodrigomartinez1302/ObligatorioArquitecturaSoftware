@@ -8,13 +8,14 @@ var db = require('../Config/db');
 mongoose.Promise = global.Promise;
 
 exports.Conectar =   function (){ 
-    mongoose.connect(
-    db.url,
-    { useNewUrlParser: true },).then(() => {
-    console.log('Connección a la base exitosa');
-  }).catch(() => {
-    console.log('Error al conectar a la base');
-  });
+    try {
+        mongoose.connect(db.url,
+            { useNewUrlParser: true },)
+            console.log('Connección a la base exitosa');
+        }
+        catch(error){
+            console.log('Error al conectar a la base');
+        }
 }
 
 exports.guardarCompra =  function(compraAGuardar){
@@ -50,6 +51,7 @@ exports.buscarGatewayPorCategoria = function(categoria){
         console.log('Gateway:'+ gateway.nombreGateway);
       });
 }
+
 
 
 

@@ -5,19 +5,18 @@ const db = require('../Config/db');
 
 mongoose.Promise = global.Promise;
 
-exports.Conectar =   function (){ 
- mongoose.connect(
-    db.url,
-    { useNewUrlParser: true },).then(() => {
-    console.log(`Connección a la base exitosa`);
-  }).catch(() => {
+exports.Conectar = function() { 
+  try {
+    mongoose.connect(db.url,
+      { useNewUrlParser: true },)
+    console.log('Connección a la base exitosa');
+  } catch(error) {
     console.log('Error al conectar a la base');
-  });
+  }
 }
-
-//Estos dos metodos moverlos a un aquete controlador
-exports.guardarCompra = function(compraAGuardar){
-    /*const esquemaAuxiliar = new compraEsquema(compraAGuardar);
+// Estos dos metodos moverlos a un aquete controlador
+exports.guardarCompra = function(compraAGuardar) {
+  /* const esquemaAuxiliar = new compraEsquema(compraAGuardar);
     esquemaAuxiliar.save(function(err){
         if (err) {
             throw new handleError('Error al guardar la compra');
@@ -25,9 +24,19 @@ exports.guardarCompra = function(compraAGuardar){
     });
     */
 }
-/*exports.cerrarLotes = function(fecha){
-    var comprasAuxiliar = mongoose.model('Compra');
-    var instancia=new comprasAuxiliar();
+exports.cerrarLotes = function(){
+        var compraAux = mongoose.model('Compra');
+        compraAux. aggregate(
+            [
+                {
+                    total:{$sum: "$monto"}
+                }
+            ]
+        ,function (err, total) {
+            if (err) return handleError(err);
+            console.log('Monto:' + total);
+          });
+
 
     let now = new Date();
     let year = now.getFullYear();
@@ -37,18 +46,20 @@ exports.guardarCompra = function(compraAGuardar){
 const start = new Date(year, month, 1);
 const end = new Date(year, month, 30);
 
-instancia.aggregate([{
-        $match : { $and :[fechaCompra: { $gte: start, $lt: end } ] },
+/*
+comprasAuxiliar.aggregate([{
+        $match : { "$and" :fechaCompra: { "$gte": start, "$lt": end } },
     },{
-        $group : {
+        "$group" : {
             _id : null,
             total : {
-                $sum : "$monto"
+                "$sum" : "$monto"
             }
         }
     }],callback);
+    */
+    
 }
-*/
 
 
 
