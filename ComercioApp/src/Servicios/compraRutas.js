@@ -3,12 +3,20 @@ const peticiones= require("../Servicios/peticionesManejador");
 
 module.exports  =  function(app,db) {
   app.post('/Compras',async(req,res)=>{
-    await persistencia.guardarCompra(req.body);
-    var response=await peticiones.enviarCompraTePagoYa(req,res);
-   console.log(response.data);
-    res.status(200).send(response.data);
-    }); 
-    
+    var compraGuardada=await persistencia.guardarCompra(req.body);
+    try{
+      var response=await peticiones.enviarCompraTePagoYa(req);
+      if(response.status != '200'){
+      await persistencia.eliminarCompra(compraGuardada);
+      res.status(response.status).send('No se pudo enviar la petición');
+    }
+    res.status(response.status).send('Se guardó la compra');
+  }
+    catch(error){
+      await persistencia.eliminarCompra(compraGuardada);
+      res.status('400').send('No se pudo enviar la petición');
+    }
+  });
   app.delete("/Compras/:id", async (req, res) => {
       persistencia.eliminarCompra(req,(error)=>{
         if(error){

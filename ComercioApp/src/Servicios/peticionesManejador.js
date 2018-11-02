@@ -10,11 +10,11 @@ exports.buscarGatewayPorCategoria = function(categoria){
       });
 }
 */
-exports.enviarCompraTePagoYa = async (req,res) => {
+exports.enviarCompraTePagoYa = async (req) => {
     try {
         var response = await axios.post('http://localhost:9000/Compras',req.body);
         return response;
     } catch (error) {
-        throw new handleError('Error en la request')
+        throw new handleError('Error en la request');
     }
 };   

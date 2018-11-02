@@ -13,7 +13,6 @@ const compra = compraEsquema.compra;
 const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-const port=9000;
 servicios(app);
 
 var jwt = require('jwt-simple');
@@ -32,7 +31,6 @@ return jwt.encode(auxToke,config.TOKEN_SECRETO);
 var resultado=crearToken();
 console.log(resultado);
 */
-//persistencia.cerrarLotes();
 
 // const pruebaCerda = async () => {
 //     try {
@@ -58,7 +56,7 @@ app.listen(CONFIG.puerto, function() {
             } 
         });
 
-
+//persistencia.cerrarLotes();
 
 
 /*

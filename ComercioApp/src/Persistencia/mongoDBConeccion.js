@@ -8,7 +8,7 @@ var db = require('../Config/db');
 mongoose.Promise = global.Promise;
 
 exports.Conectar =   function (){ 
- mongoose.connect(
+    mongoose.connect(
     db.url,
     { useNewUrlParser: true },).then(() => {
     console.log('Connección a la base exitosa');
@@ -18,21 +18,23 @@ exports.Conectar =   function (){
 }
 
 exports.guardarCompra =  function(compraAGuardar){
-    /*var esquemaAuxiliar = new compras(compraAGuardar);
+    var esquemaAuxiliar = new compras(compraAGuardar);
        esquemaAuxiliar.save(function(err){
         if (err) {
             throw new handleError('Error al guardar la compra');
         } 
-    });*/
+    });
+    return esquemaAuxiliar; 
 }
 exports.eliminarCompra = function(compraAEliminar){
-    compras.deleteOne({ _id: compraAEliminar.params.id }, function (err) {
+    compras.deleteOne({ _id: compraAEliminar._id }, function (err) {
         if (err) throw new handleError('No se encontró la compra');
       });
+      console.log('Se eliminó la compra');
 }
-exports.guardarGateway = function(gatewayAGuardar){
+exports.guardarGateway = async function(gatewayAGuardar){
     var esquemaAuxiliar = new gateways(gatewayAGuardar);
-    esquemaAuxiliar.save(function(error,respuesta){
+    await esquemaAuxiliar.save(function(error,respuesta){
         if (error) {
             console.log(error);
         }
