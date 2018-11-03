@@ -7,14 +7,20 @@ module.exports  = function(app,db) {
   app.post('/Compras',async(req,res)=>{
     var compraGuardada=await persistencia.guardarCompra(req.body);
     try{
-      var response=await peticiones.enviarCompraGateway(compraGuardada);
-      if(response.status != '200'){
+      var respuestaGateway=await peticiones.enviarCompraGateway(compraGuardada);
+      var respuestaRed=await peticiones.enviarCompraRed(compraGuardada);
+      console.log(respuestaGateway.status);
+      console.log(respuestaRed.status);
+
+      if(respuestaGateway.status != 200 || respuestaRed.status != 200 ){
       await persistencia.eliminarCompra(compraGuardada);
-      res.status(response.status).send('No se pudo enviar la petición');
-    }
-    res.status(response.status).send(compraGuardada);
-  }
+      res.status(400).send('No se pudo enviar la petición');
+      }else{
+        res.status(respuestaGateway.status).send(compraGuardada);
+      }
+}
     catch(error){
+      console.log('Entre al catch');
       await persistencia.eliminarCompra(compraGuardada);
       res.status('400').send('No se pudo enviar la petición');
     }

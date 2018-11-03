@@ -5,12 +5,13 @@ module.exports  =  function(app,db) {
   app.post('/Compras',async(req,res)=>{
     var compraGuardada=await persistencia.guardarCompra(req.body);
     try{
-      var response=await peticiones.enviarCompraTePagoYa(req);
-      if(response.status != '200'){
+      var respuesta=await peticiones.enviarCompraTePagoYa(req);
+      if(respuesta.status != 200){
       await persistencia.eliminarCompra(compraGuardada);
-      res.status(response.status).send('No se pudo enviar la petición');
-    }
-    res.status(response.status).send('Se guardó la compra');
+      res.status(respuesta.status).send('No se pudo enviar la petición');
+    }else{
+      res.status(respuesta.status).send('Se guardó la compra');
+    }   
   }
     catch(error){
       await persistencia.eliminarCompra(compraGuardada);

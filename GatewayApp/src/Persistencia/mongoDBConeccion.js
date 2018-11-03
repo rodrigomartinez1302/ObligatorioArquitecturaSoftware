@@ -1,13 +1,13 @@
-const mongoose = require('mongoose');
-//const Schema = mongoose.Schema;
-const compraEsquema= require('../Modelo/compraEsquema.js');
-const db = require('../Config/db');
+var mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+var compra= require('../Modelo/compraEsquema');
+var db = require('../Config/db');
 
 mongoose.Promise = global.Promise;
 
 exports.Conectar = function() { 
   try {
-    mongoose.connect(db.url,
+    mongoose.connect(db.URL,
       { useNewUrlParser: true },)
     console.log('Connección a la base exitosa');
   } catch(error) {
@@ -15,18 +15,20 @@ exports.Conectar = function() {
   }
 }
 // Estos dos metodos moverlos a un aquete controlador
-exports.guardarCompra = function(compraAGuardar) {
-  /* const esquemaAuxiliar = new compraEsquema(compraAGuardar);
-    esquemaAuxiliar.save(function(err){
-        if (err) {
-            throw new handleError('Error al guardar la compra');
-        } 
-    });
-    */
-}
-exports.cerrarLotes = function(){
-        var compraAux = mongoose.model('Compra');
-        compraAux. aggregate(
+exports.guardarCompra = function(compraAGuardar){
+    var esquemaAuxiliar = new compra(compraAGuardar);
+     esquemaAuxiliar.save(function(error){
+         if (error) {
+             throw new handleError('Error al guardar la compra');
+            }
+     });
+     return esquemaAuxiliar;  
+ }
+    /*
+        if (err) throw new handleError('No se encontró la compra');
+      });
+        let compraAux = mongoose.model('Compra');
+        compraAux.aggregate(
             [
                 {
                     total:{$sum: "$monto"}
@@ -37,29 +39,15 @@ exports.cerrarLotes = function(){
             console.log('Monto:' + total);
           });
 
-
     let now = new Date();
     let year = now.getFullYear();
     let month = now.getMonth();
     let date = now.getDate();
+    let start = new Date(year, month, 1);
+    let end = new Date(year, month, 30);
 
-const start = new Date(year, month, 1);
-const end = new Date(year, month, 30);
+   */
 
-/*
-comprasAuxiliar.aggregate([{
-        $match : { "$and" :fechaCompra: { "$gte": start, "$lt": end } },
-    },{
-        "$group" : {
-            _id : null,
-            total : {
-                "$sum" : "$monto"
-            }
-        }
-    }],callback);
-    */
-    
-}
 
 
 

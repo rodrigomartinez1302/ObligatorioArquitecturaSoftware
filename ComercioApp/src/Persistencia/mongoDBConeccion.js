@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-var compras= require('../Modelo/compraEsquema.js');
+var compra= require('../Modelo/compraEsquema.js');
 var gateways= require('../Modelo/categoriaCompraGatewayEsquema.js');
 var db = require('../Config/db');
 
@@ -17,9 +17,8 @@ exports.Conectar =   function (){
             console.log('Error al conectar a la base');
         }
 }
-
 exports.guardarCompra =  function(compraAGuardar){
-    var esquemaAuxiliar = new compras(compraAGuardar);
+    var esquemaAuxiliar = new compra(compraAGuardar);
        esquemaAuxiliar.save(function(err){
         if (err) {
             throw new handleError('Error al guardar la compra');
@@ -28,8 +27,10 @@ exports.guardarCompra =  function(compraAGuardar){
     return esquemaAuxiliar; 
 }
 exports.eliminarCompra = function(compraAEliminar){
-    compras.deleteOne({ _id: compraAEliminar._id }, function (err) {
-        if (err) throw new handleError('No se encontró la compra');
+    compra.deleteOne({ _id: compraAEliminar._id }, function (err) {
+        if (err) {
+            throw new handleError('No se encontró la compra');
+        }
       });
       console.log('Se eliminó la compra');
 }

@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const persistencia = require('./src/Persistencia/mongoDBConeccion');
 const servicios = require('./src/Servicios/compraRutas');
 const compraEsquema = require('./src/Modelo/compraEsquema');
-const CONFIG = require('./src/Config/app');
+const config = require('./src/Config/app');
 
 const compra = compraEsquema.compra;
 
@@ -15,7 +15,6 @@ servicios(app);
 
 var jwt = require('jwt-simple');
 var moment = require('moment');
-var config=('.src/config');
 /*
 crearToken = function(compraRecibida){
 var auxToke = {
@@ -39,21 +38,17 @@ console.log(resultado);
 //     }
 // }
 
-
 try{
     persistencia.Conectar();
 } catch(error){
     console.log("Error al conectar"); 
 }
-app.listen(CONFIG.puerto, function() { 
+app.listen(config.PUERTO, function() { 
     console.log('App corriendo'); }).on('error', function(err) { 
         if (err) {
              console.log('Error al levantar la app'); 
             } 
         });
-
-persistencia.cerrarLotes();
-
 
 /*
 var nuevaCompra=compra.crearCompra(
