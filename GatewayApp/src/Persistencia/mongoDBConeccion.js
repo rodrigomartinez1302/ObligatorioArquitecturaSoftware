@@ -19,7 +19,7 @@ exports.guardarCompra = function(compraAGuardar){
     var esquemaAuxiliar = new compra(compraAGuardar);
      esquemaAuxiliar.save(function(error){
          if (error) {
-             throw new handleError('Error al guardar la compra');
+             throw new Error('Error al guardar la compra');
             }
      });
      return esquemaAuxiliar;  

@@ -5,14 +5,18 @@ const peticiones= require("../Servicios/peticionesManejador");
 
 module.exports  = function(app,db) {
   app.post('/Compras',async(req,res)=>{
+    try{
     var compraGuardada=await persistencia.guardarCompra(req.body);
+    }catch(error){
+      res.status(400).send('No se pudo guardar la compra');
+    }
     try{
       var respuestaGateway=await peticiones.enviarCompraGateway(compraGuardada);
       var respuestaRed=await peticiones.enviarCompraRed(compraGuardada);
-      console.log(respuestaGateway.status);
-      console.log(respuestaRed.status);
+      console.log('status gate '+respuestaGateway.status);
+      console.log('status red '+respuestaRed.status);
 
-      if(respuestaGateway.status != 200 || respuestaRed.status != 200 ){
+      if(respuestaGateway.status != 200 || respuestaRed.status != 200){
       await persistencia.eliminarCompra(compraGuardada);
       res.status(400).send('No se pudo enviar la petición');
       }else{

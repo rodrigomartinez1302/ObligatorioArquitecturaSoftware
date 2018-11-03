@@ -20,7 +20,7 @@ exports.guardarCompra = function(compraAGuardar){
    var esquemaAuxiliar = new compra(compraAGuardar);
     esquemaAuxiliar.save(function(error){
         if (error){
-            throw new handleError('Error al guardar la compra');
+            throw new Error('Error al guardar la compra');
         }
     });
     return esquemaAuxiliar;  
@@ -28,7 +28,9 @@ exports.guardarCompra = function(compraAGuardar){
 exports.eliminarCompra = function(compraAEliminar){
     //console.log(compraAEliminar.id);
     compra.deleteOne({ _id: compraAEliminar._id }, function (err) {
-        if (err) throw new handleError('No se encontró la compra');
+        if (err) {
+            throw new Error('No se encontró la compra');
+        }
       });
       console.log('Se eliminó la compra');    
 }
