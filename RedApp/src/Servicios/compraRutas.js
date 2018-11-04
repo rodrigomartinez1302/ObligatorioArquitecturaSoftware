@@ -10,7 +10,6 @@ module.exports  = function(app,db) {
   }catch(error){
     res.status(400).send('No se pudo guardar la compra');
   }
-    console.log(compraGuardada);
     res.status(200).send(compraGuardada);
   });
   app.delete("/Compras/:id", (req, res) => {

@@ -15,7 +15,6 @@ module.exports  = function(app,db) {
       var respuestaRed=await peticiones.enviarCompraRed(compraGuardada);
       console.log('status gate '+respuestaGateway.status);
       console.log('status red '+respuestaRed.status);
-
       if(respuestaGateway.status != 200 || respuestaRed.status != 200){
       await persistencia.eliminarCompra(compraGuardada);
       res.status(400).send('No se pudo enviar la petición');

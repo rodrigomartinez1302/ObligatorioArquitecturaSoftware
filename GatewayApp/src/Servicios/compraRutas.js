@@ -7,7 +7,6 @@ module.exports = function (app, db) {
      }catch(error){
       res.status(400).send('No se pudo guardar la compra');
     }
-    console.log(compraGuardada);
     res.status(200).send('Se guardó la compra');
   });
 };
