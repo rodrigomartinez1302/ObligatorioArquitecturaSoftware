@@ -37,8 +37,13 @@ exports.eliminarCompra = function(compraAEliminar){
       });
       console.log('Se eliminó la compra');    
 }
+<<<<<<< HEAD
 /*
 exports.controlFraude = function(nroTarjeta){
+=======
+
+exports.controlFraude = async function(nroTarjeta){
+>>>>>>> e4471adb0773b64c6878d6ee4c50a89f241c7be1
     nroTarjeta
     var esquemaAuxiliar = mongoose.model('Compra');
     var desde = new Date();
@@ -46,29 +51,29 @@ exports.controlFraude = function(nroTarjeta){
     desde.setDate(diaDelMes - CANTIDADEDIASACONTROLAR);
     //var hasta = new Date();
     var hasta = new Date("2018-12-12 03:00:00.000Z");
-    esquemaAuxiliar.find(
-       { 
-            "fechaCompra":{
+    await  esquemaAuxiliar.find(
+      {
+          "fechaCompra":{
                 "$gte": desde,
                 "$lte": hasta
             },
             "tarjeta": {
                 "$eq":nroTarjeta
-            },
-            "cuenta": { "$sum": 1 }
-
+            }
         }
-        
     ).exec().then((resultado)=>{
-        console.log(resultado);
+        return resultado.length;
     })
  }
 
+<<<<<<< HEAD
 
 exports.cerrarLotes = function(fecha){
     var comprasAuxiliar = mongoose.model('Compra').findOne({ monto: 123 },'tarjeta.numero');
     comprasAuxiliar.tarjeta.numero;
 }
 */
+=======
+>>>>>>> e4471adb0773b64c6878d6ee4c50a89f241c7be1
 
 
