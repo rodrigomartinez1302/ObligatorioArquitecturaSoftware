@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var db = require('../Config/db');
 var compra= require('../Modelo/compraEsquema');
+const CANTIDADEDIASACONTROLAR = 3;
 
 mongoose.Promise = global.Promise;
 
@@ -34,6 +35,32 @@ exports.eliminarCompra = function(compraAEliminar){
       });
       console.log('Se eliminó la compra');    
 }
+
+exports.controlFraude = function(nroTarjeta){
+    nroTarjeta
+    var esquemaAuxiliar = mongoose.model('Compra');
+    var desde = new Date();
+    var diaDelMes = desde.getDate();
+    desde.setDate(diaDelMes - CANTIDADEDIASACONTROLAR);
+    //var hasta = new Date();
+    var hasta = new Date("2018-12-12 03:00:00.000Z");
+    esquemaAuxiliar.find(
+       { 
+            "fechaCompra":{
+                "$gte": desde,
+                "$lte": hasta
+            },
+            "tarjeta": {
+                "$eq":nroTarjeta
+            },
+            "cuenta": { "$sum": 1 }
+
+        }
+        
+    ).exec().then((resultado)=>{
+        console.log(resultado);
+    })
+ }
 
 /*
 exports.cerrarLotes = function(fecha){
