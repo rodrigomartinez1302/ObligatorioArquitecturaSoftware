@@ -32,8 +32,4 @@ app.listen(CONFIG.puerto, function() {
             } 
         });
 
-<<<<<<< HEAD
 //persistencia.controlFraude(123);
-=======
- persistencia.controlFraude(1111);
->>>>>>> e4471adb0773b64c6878d6ee4c50a89f241c7be1
