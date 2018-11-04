@@ -9,6 +9,15 @@ module.exports = function (app, db) {
     }
     res.status(200).send('Se guardó la compra');
   });
+  app.delete("/Compras/", async (req, res) => {
+    try{
+      await persistencia.eliminarCompra(req);
+      res.status(200).send('Se eliminó la compra'); 
+    }
+    catch(Err){
+      res.status(400).send('No se encontró la compra');
+    }
+  });
 };
 
 

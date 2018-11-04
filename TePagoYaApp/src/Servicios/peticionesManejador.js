@@ -52,6 +52,22 @@ exports.enviarCompraRed= async (compraGuardada) => {
         throw new handleError('Error al realizar la petición');
     }
 };   
+exports.eliminarCompraGateway = async (compraGuardada) => { 
+    try {
+        let response =await axios.delete('http://localhost:10000/Compras',compraGuardada)
+        return response;
+    } catch (error) {
+        throw new Error('Error al realizar la petición');
+    }
+};  
+exports.eliminarCompraRed = async (compraGuardada) => { 
+    try {
+        let response =await axios.delete('http://localhost:11000/Compras',compraGuardada)
+        return response;
+    } catch (error) {
+        throw new Error('Error al realizar la petición');
+    }
+};    
 
 
     

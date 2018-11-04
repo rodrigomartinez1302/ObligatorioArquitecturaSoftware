@@ -32,3 +32,5 @@ app.listen(CONFIG.puerto, function() {
              console.log('Error al levantar la app'); 
             } 
         });
+
+//persistencia.controlFraude(123);

@@ -24,7 +24,7 @@ exports.guardarCompra =  function(compraAGuardar){
             throw new Error('Error al guardar la compra');
         } 
         else{
-            console.log('Se guardó la compra con id'+ esquemaAuxiliar._id);
+            console.log('Se guardó la compra con id '+ esquemaAuxiliar._id);
         }
     });
     return esquemaAuxiliar; 
@@ -48,11 +48,15 @@ exports.guardarGateway = async function(gatewayAGuardar){
         }
     });
 }
-exports.buscarGatewayPorCategoria = function(categoria){
+exports.buscarGatewayPorCategoria= async function(categoria){
     var gatewayAuxiliar = mongoose.model('CategoriaCompraGatewayEsquema');
-    gatewayAuxiliar.findOne({ 'categoriaCompra': categoria}, 'nombreGateway', function (err, gateway) {
-        if (err) return handleError(err);
-        console.log('Gateway:'+ gateway.nombreGateway);
+    await  gatewayAuxiliar.findOne({ 'categoriaCompra': categoria}, 'nombreGateway', function (err, gateway) {
+        if (err) {
+            return handleError(err);
+        }
+        else{
+        return gateway.nombreGateway;
+        }
       });
 }
 
