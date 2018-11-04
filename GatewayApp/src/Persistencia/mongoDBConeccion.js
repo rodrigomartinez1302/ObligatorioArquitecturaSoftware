@@ -24,6 +24,23 @@ exports.guardarCompra = function(compraAGuardar){
      });
      return esquemaAuxiliar;  
  }
+
+ exports.cerrarLotes = function(){
+    var esquemaAuxiliar = mongoose.model('Compra');
+    esquemaAuxiliar.aggregate(
+        [{
+            $group:{
+                _id: null,
+                total: {$sum: "$monto"}
+            }
+        }]
+    ).exec().then((resultado)=>{
+        let retorno= parseInt(resultado[0].total);
+        return retorno;
+    })
+ }
+    
+
     /*
         if (err) throw new handleError('No se encontró la compra');
       });

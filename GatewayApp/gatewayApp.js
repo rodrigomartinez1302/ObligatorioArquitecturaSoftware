@@ -43,12 +43,15 @@ try{
 } catch(error){
     console.log("Error al conectar"); 
 }
-app.listen(config.PUERTO, function() { 
-    console.log('App corriendo'); }).on('error', function(err) { 
+app.listen(config.PUERTO, function() {
+    console.log('App corriendo'); }).on('error', function(err){
         if (err) {
-             console.log('Error al levantar la app'); 
-            } 
-        });
+            console.log('Error al levantar la app'); 
+        } 
+    });
+
+    var resultado=persistencia.cerrarLotes();
+    console.log(resultado);
 
 /*
 var nuevaCompra=compra.crearCompra(

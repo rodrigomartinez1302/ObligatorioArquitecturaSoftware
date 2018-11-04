@@ -1,6 +1,6 @@
-const mongoose = require('mongoose');
+var mongoose = require('mongoose');
 
-const compraEsquema = new mongoose.Schema({
+var compraEsquema = new mongoose.Schema({
     tarjeta:{
         numero : {type: Number, required: true, max: 9999},
         vencimiento : {type: String, required: true},
