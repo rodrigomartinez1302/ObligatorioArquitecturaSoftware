@@ -50,7 +50,7 @@ app.listen(config.PUERTO, function() {
         } 
     });
 
-  persistencia.cerrarLotes("2018-12-13");
+  //persistencia.cerrarLotes("2018-12-13");
    
 
 /*

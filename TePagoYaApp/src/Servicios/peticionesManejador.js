@@ -36,7 +36,6 @@ exports.enviarCompraGateway = async (compraGuardada) => {
     try {
         let compraEnviar={monto:compraGuardada.monto,fechaCompra:compraGuardada.fechaCompra
         ,tarjeta:compraGuardada.tarjeta.numero};
-        console.log(compraEnviar);
         let response =await axios.post('http://localhost:10000/Compras',compraEnviar)
         return response;
     } catch (error) {
@@ -47,7 +46,6 @@ exports.enviarCompraRed= async (compraGuardada) => {
     try {
         let compraEnviar={monto:compraGuardada.monto,fechaCompra:compraGuardada.fechaCompra
         ,tarjeta:compraGuardada.tarjeta.numero};
-        //console.log(compraEnviar);
         let response =await axios.post('http://localhost:11000/Compras',compraEnviar)
         return response;
     } catch (error) {

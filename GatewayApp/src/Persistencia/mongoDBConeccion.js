@@ -21,6 +21,9 @@ exports.guardarCompra = function(compraAGuardar){
          if (error) {
              throw new Error('Error al guardar la compra');
             }
+            else{
+                console.log('Se guardó la compra con id'+ esquemaAuxiliar._id);
+            }
      });
      return esquemaAuxiliar;  
  }
