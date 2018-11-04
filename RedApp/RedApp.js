@@ -32,4 +32,4 @@ app.listen(CONFIG.puerto, function() {
             } 
         });
 
-persistencia.controlFraude(123);
+//persistencia.controlFraude(123);

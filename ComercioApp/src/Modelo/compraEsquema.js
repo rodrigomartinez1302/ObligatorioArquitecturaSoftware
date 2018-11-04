@@ -28,7 +28,8 @@ var compraEsquema = new mongoose.Schema({
         cantidad : {type: Number, required: true, max: 99999999},
     },
     monto : {type: Number, required: true, max: 99999999},
-    fechaCompra : {type: Date, required: true}
+    fechaCompra : {type: Date, required: true},
+    gateWay : {type: String}
 });
 
 module.exports = mongoose.model('Compra', compraEsquema);

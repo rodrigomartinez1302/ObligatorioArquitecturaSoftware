@@ -24,13 +24,12 @@ exports.guardarCompra = function(compraAGuardar){
             throw new Error('Error al guardar la compra');
         }
         else{
-            console.log('Se guardó la compra con id'+ esquemaAuxiliar._id);
+            console.log('Se guardó la compra con id '+ esquemaAuxiliar._id);
         }
     });
     return esquemaAuxiliar;  
 }
 exports.eliminarCompra = function(compraAEliminar){
-    //console.log(compraAEliminar.id);
     compra.deleteOne({ _id: compraAEliminar._id }, function (err) {
         if (err) {
             throw new Error('No se encontró la compra');
@@ -38,7 +37,7 @@ exports.eliminarCompra = function(compraAEliminar){
       });
       console.log('Se eliminó la compra');    
 }
-
+/*
 exports.controlFraude = function(nroTarjeta){
     nroTarjeta
     var esquemaAuxiliar = mongoose.model('Compra');
@@ -65,7 +64,7 @@ exports.controlFraude = function(nroTarjeta){
     })
  }
 
-/*
+
 exports.cerrarLotes = function(fecha){
     var comprasAuxiliar = mongoose.model('Compra').findOne({ monto: 123 },'tarjeta.numero');
     comprasAuxiliar.tarjeta.numero;

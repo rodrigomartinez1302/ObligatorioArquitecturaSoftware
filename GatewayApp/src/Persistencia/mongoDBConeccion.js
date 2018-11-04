@@ -15,18 +15,26 @@ exports.Conectar = function() {
   }
 }
 // Estos dos metodos moverlos a un aquete controlador
-exports.guardarCompra = function(compraAGuardar){
+exports.guardarCompra =  function(compraAGuardar){
     var esquemaAuxiliar = new compra(compraAGuardar);
-     esquemaAuxiliar.save(function(error){
-         if (error) {
-             throw new Error('Error al guardar la compra');
-            }
-            else{
-                console.log('Se guardó la compra con id'+ esquemaAuxiliar._id);
-            }
-     });
-     return esquemaAuxiliar;  
- }
+       esquemaAuxiliar.save(function(err){
+        if (err) {
+            throw new Error('Error al guardar la compra');
+        } 
+        else{
+            console.log('Se guardó la compra con id '+ esquemaAuxiliar._id);
+        }
+    });
+    return esquemaAuxiliar; 
+}
+exports.eliminarCompra = function(compraAEliminar){
+     compra.deleteOne({ _id: compraAEliminar._id }, function (err) {
+        if (err) {
+            throw new Error('No se encontró la compra');
+        }
+      });
+      console.log('Se eliminó la compra');
+}
 
  exports.cerrarLotes = function(fechaCierre){
     var esquemaAuxiliar = mongoose.model('Compra');

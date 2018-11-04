@@ -6,26 +6,35 @@ const peticiones= require("../Servicios/peticionesManejador");
 module.exports  = function(app,db) {
   app.post('/Compras',async(req,res)=>{
     try{
-    var compraGuardada=await persistencia.guardarCompra(req.body);
+    var compraGuardada= await persistencia.guardarCompra(req.body);
+    console.log('Termine de guardar');
     }catch(error){
       res.status(400).send('No se pudo guardar la compra');
     }
     try{
-      var respuestaGateway=await peticiones.enviarCompraGateway(compraGuardada);
-      var respuestaRed=await peticiones.enviarCompraRed(compraGuardada);
-      console.log('status gate '+respuestaGateway.status);
-      console.log('status red '+respuestaRed.status);
-      if(respuestaGateway.status != 200 || respuestaRed.status != 200){
+      var respuestaGateway= await peticiones.enviarCompraGateway(compraGuardada);
+      if(respuestaGateway.status != 200){
+        await persistencia.eliminarCompra(compraGuardada);
+      }
+    }
+    catch(error){
+      console.log('Entre al catch 1');
       await persistencia.eliminarCompra(compraGuardada);
       res.status(400).send('No se pudo enviar la petición');
-      }else{
-        res.status(respuestaGateway.status).send(compraGuardada);
+    }
+    try{
+      var respuestaRed= await peticiones.enviarComprRed(compraGuardada);
+      if(respuestaRed.status != 200){
+        await persistencia.eliminarCompra(compraGuardada);
+        var respuestaGateway= await peticiones.eliminarCompraGateway(compraGuardada);
+        res.status(400).send('No se pudo enviar la petición');
       }
-}
+    }
     catch(error){
-      console.log('Entre al catch');
+      console.log('Entre al catch 2');
+      var respuestaGateway= await peticiones.eliminarCompraGateway(compraGuardada);
       await persistencia.eliminarCompra(compraGuardada);
-      res.status('400').send('No se pudo enviar la petición');
+      res.status(400).send('No se pudo enviar la petición');
     }
   });
   app.delete("/Compras/:id", (req, res) => {

@@ -15,7 +15,6 @@ exports.Conectar =   function (){
             console.log('Error al conectar a la base');
         }
 }
-
 //Estos dos metodos moverlos a un aquete controlador
 exports.guardarCompra = function(compraAGuardar){
    var esquemaAuxiliar = new compras(compraAGuardar);
@@ -24,13 +23,12 @@ exports.guardarCompra = function(compraAGuardar){
             throw new Error('Error al guardar la compra');
         }
         else{
-            console.log('Se guardó la compra con id'+ esquemaAuxiliar._id);
+            console.log('Se guardó la compra con id '+ esquemaAuxiliar._id);
         }
     });
     return esquemaAuxiliar;  
 }
 exports.eliminarCompra = function(compraAEliminar){
-    //console.log(compraAEliminar.id);
     compras.deleteOne({ _id: compraAEliminar._id }, function (err) {
         if (err) {
             throw new Error('No se encontró la compra');
@@ -38,12 +36,24 @@ exports.eliminarCompra = function(compraAEliminar){
       });
       console.log('Se eliminó la compra');    
 }
-
-/*
-exports.cerrarLotes = function(fecha){
-    var comprasAuxiliar = mongoose.model('Compra').findOne({ monto: 123 },'tarjeta.numero');
-    comprasAuxiliar.tarjeta.numero;
+exports.guardarGateway = async function(gatewayAGuardar){
+    var esquemaAuxiliar = new gateways(gatewayAGuardar);
+    await esquemaAuxiliar.save(function(error,respuesta){
+        if (error) {
+            console.log(error);
+        }
+        else{
+            console.log(respuesta);
+        }
+    });
 }
-*/
+exports.buscarGatewayPorCategoria = function(categoria){
+    var gatewayAuxiliar = mongoose.model('CategoriaCompraGatewayEsquema');
+    gatewayAuxiliar.findOne({ 'categoriaCompra': categoria}, 'nombreGateway', function (err, gateway) {
+        if (err) return handleError(err);
+        console.log('Gateway:'+ gateway.nombreGateway);
+      });
+}
+
 
 
