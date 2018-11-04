@@ -25,11 +25,10 @@ try{
 } catch(error){
     console.log("Error al conectar"); 
 }
+
 app.listen(CONFIG.puerto, function() { 
     console.log('App corriendo'); }).on('error', function(err) { 
         if (err) {
              console.log('Error al levantar la app'); 
             } 
         });
-
- persistencia.controlFraude(1111);

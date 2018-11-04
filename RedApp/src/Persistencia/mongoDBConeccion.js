@@ -40,12 +40,12 @@ exports.eliminarCompra = function(compraAEliminar){
 }
 
 exports.controlFraude = async function(nroTarjeta){
-    nroTarjeta
     var esquemaAuxiliar = mongoose.model('Compra');
     var desde = new Date();
     var diaDelMes = desde.getDate();
     desde.setDate(diaDelMes - CANTIDADEDIASACONTROLAR);
     //var hasta = new Date();
+    let retorno;
     var hasta = new Date("2018-12-12 03:00:00.000Z");
     await  esquemaAuxiliar.find(
       {
@@ -58,9 +58,7 @@ exports.controlFraude = async function(nroTarjeta){
             }
         }
     ).exec().then((resultado)=>{
-        return resultado.length;
+        retorno = resultado.length;
     })
+    return retorno;
  }
-
-
-
