@@ -25,18 +25,20 @@ exports.guardarCompra = function(compraAGuardar){
      return esquemaAuxiliar;  
  }
 
- exports.cerrarLotes = function(){
+ exports.cerrarLotes = function(fechaCierre){
     var esquemaAuxiliar = mongoose.model('Compra');
-    esquemaAuxiliar.aggregate(
-        [{
-            $group:{
-                _id: null,
-                total: {$sum: "$monto"}
+    var hoy = new Date();
+    hoy.setHours(0,0,0,0); 
+    esquemaAuxiliar.find(
+        {
+            "fechaCompra":{
+                "$gte": hoy,
+                "$lte": fechaCierre
             }
-        }]
+        }
     ).exec().then((resultado)=>{
-        let retorno= parseInt(resultado[0].total);
-        return retorno;
+        console.log(resultado);
+      
     })
  }
     

@@ -50,8 +50,8 @@ app.listen(config.PUERTO, function() {
         } 
     });
 
-    var resultado=persistencia.cerrarLotes();
-    console.log(resultado);
+  persistencia.cerrarLotes("2018-12-13");
+   
 
 /*
 var nuevaCompra=compra.crearCompra(
