@@ -1,14 +1,14 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-var db = require('../Config/db');
 var compra= require('../Modelo/compraEsquema');
-const CANTIDADEDIASACONTROLAR = 3;
+var configDB=require('../Config/db');
+var configApp=require('../Config/app');
 
 mongoose.Promise = global.Promise;
 
 exports.Conectar =   function (){ 
     try {
-        mongoose.connect(db.url,
+        mongoose.connect(configDB.url,
             { useNewUrlParser: true },)
             console.log('Connección a la base exitosa');
         }
@@ -16,37 +16,30 @@ exports.Conectar =   function (){
             console.log('Error al conectar a la base');
         }
 }
-//Estos dos metodos moverlos a un aquete controlador
-exports.guardarCompra = function(compraAGuardar){
-   var esquemaAuxiliar = new compra(compraAGuardar);
-    esquemaAuxiliar.save(function(error){
-        if (error){
-            throw new Error('Error al guardar la compra');
-        }
-        else{
-            console.log('Se guardó la compra con id '+ esquemaAuxiliar._id);
-        }
-    });
-    return esquemaAuxiliar;  
+exports.guardarCompra = async function(req){
+    var esquemaAuxiliar = new compra(req.body);
+    await esquemaAuxiliar.save();
+    console.log('guarde el id:'+ esquemaAuxiliar._id);
+    return esquemaAuxiliar._id;
 }
-exports.eliminarCompra = function(compraAEliminar){
-    compra.deleteOne({ _id: compraAEliminar._id }, function (err) {
-        if (err) {
-            throw new Error('No se encontró la compra');
-        }
-      });
-      console.log('Se eliminó la compra');    
+exports.eliminarCompra =async function(req){
+     let eliminado=await compra.findByIdAndDelete({ _id:req.params.id});
+     if(!eliminado){
+         throw new Error('No se encontró el id');
+     }
+     console.log('Borre el id:'+ req.params.id);
+     return req.params.id;
 }
-
 exports.controlFraude = async function(nroTarjeta){
-    nroTarjeta
+    var resultado;
     var esquemaAuxiliar = mongoose.model('Compra');
     var desde = new Date();
-    var diaDelMes = desde.getDate();
-    desde.setDate(diaDelMes - CANTIDADEDIASACONTROLAR);
-    //var hasta = new Date();
-    var hasta = new Date("2018-12-12 03:00:00.000Z");
-    await  esquemaAuxiliar.find(
+    desde.setDate(desde.getDate() - configApp.diasControlFraude);
+    var hasta = new Date();
+    //console.log(desde);
+    //console.log(hasta);
+    //console.log(nroTarjeta);
+    resultado= await esquemaAuxiliar.find(
       {
           "fechaCompra":{
                 "$gte": desde,
@@ -56,9 +49,9 @@ exports.controlFraude = async function(nroTarjeta){
                 "$eq":nroTarjeta
             }
         }
-    ).exec().then((resultado)=>{
-        return resultado.length;
-    })
+    ).exec();//.then((resultado)=>{
+    return resultado.length;
+//})
  }
 
 

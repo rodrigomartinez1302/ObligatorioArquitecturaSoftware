@@ -1,3 +1,4 @@
 module.exports = {
-    puerto : '8000'
+    PUERTO : '8000',
+    RUT:'125'
 }

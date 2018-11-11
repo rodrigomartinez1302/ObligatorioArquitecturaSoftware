@@ -1,5 +1,5 @@
 var mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+var Schema = mongoose.Schema;
 var compra= require('../Modelo/compraEsquema');
 var db = require('../Config/db');
 
@@ -15,28 +15,22 @@ exports.Conectar = function() {
   }
 }
 // Estos dos metodos moverlos a un aquete controlador
-exports.guardarCompra =  function(compraAGuardar){
-    var esquemaAuxiliar = new compra(compraAGuardar);
-       esquemaAuxiliar.save(function(err){
-        if (err) {
-            throw new Error('Error al guardar la compra');
-        } 
-        else{
-            console.log('Se guardó la compra con id '+ esquemaAuxiliar._id);
-        }
-    });
-    return esquemaAuxiliar; 
+exports.guardarCompra = async function(req){
+    var esquemaAuxiliar = new compra(req.body);
+    await esquemaAuxiliar.save();
+    console.log('guarde el id:'+ esquemaAuxiliar._id);
+    return esquemaAuxiliar._id;
 }
-exports.eliminarCompra = function(compraAEliminar){
-     compra.deleteOne({ _id: compraAEliminar._id }, function (err) {
-        if (err) {
-            throw new Error('No se encontró la compra');
-        }
-      });
-      console.log('Se eliminó la compra');
+exports.eliminarCompra =async function(req){
+     let eliminado=await compra.findByIdAndDelete({ _id:req.params.id});
+     if(!eliminado){
+         throw new Error('No se encontró el id');
+     }
+     console.log('Borre el id:'+ req.params.id);
+     return req.params.id;
 }
 
- exports.cerrarLotes = function(fechaCierre){
+ exports.cerrarLotes = function(fechaCierre,RUT){
     var esquemaAuxiliar = mongoose.model('Compra');
     var hoy = new Date();
     hoy.setHours(0,0,0,0); 
@@ -45,6 +39,9 @@ exports.eliminarCompra = function(compraAEliminar){
             "fechaCompra":{
                 "$gte": hoy,
                 "$lte": fechaCierre
+            },
+            "RUT": {
+                "$eq":RUT
             }
         }
     ).exec().then((resultado)=>{

@@ -27,7 +27,12 @@ try{
 }
 app.listen(CONFIG.puerto, function() { 
     console.log('App corriendo'); }).on('error', function(err) { 
-        if (err) {
-             console.log('Error al levantar la app'); 
-            } 
+        if(err) {
+            console.log('Error al levantar la app'); } 
         });
+//var json={nombre:'gateway2',URL:'http://localhost:1000x/Compras'};
+//persistencia.guardarGateway(json);
+
+//persistencia.buscarNombreGateway('5be6e72740613d34d85215c8');
+
+

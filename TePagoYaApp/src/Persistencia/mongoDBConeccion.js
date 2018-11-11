@@ -1,7 +1,8 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var db = require('../Config/db');
-var compras= require('../Modelo/compraEsquema');
+var compra= require('../Modelo/compraEsquema');
+var gateway= require('../Modelo/URLGateWayEsquema');
 
 mongoose.Promise = global.Promise;
 
@@ -16,28 +17,21 @@ exports.Conectar =   function (){
         }
 }
 //Estos dos metodos moverlos a un aquete controlador
-exports.guardarCompra = function(compraAGuardar){
-   var esquemaAuxiliar = new compras(compraAGuardar);
-    esquemaAuxiliar.save(function(error){
-        if (error) {
-            throw new Error('Error al guardar la compra');
-        }
-        else{
-            console.log('Se guardó la compra con id '+ esquemaAuxiliar._id);
-        }
-    });
-    return esquemaAuxiliar;  
-}
-exports.eliminarCompra = function(compraAEliminar){
-    compras.deleteOne({ _id: compraAEliminar._id }, function (err) {
-        if (err) {
-            throw new Error('No se encontró la compra');
-        }
-      });
-      console.log('Se eliminó la compra');    
+exports.guardarCompra =async function(req){
+   var esquemaAuxiliarCompra = new compra(req.body);
+   await esquemaAuxiliarCompra.save();
+   return esquemaAuxiliarCompra._id; 
+ }   
+ exports.eliminarCompra =async function(idCompraAEliminar){
+    let eliminado=await compra.findByIdAndDelete(idCompraAEliminar);
+    if(!eliminado){
+        throw new Error('No se encontró el id');
+    }
+    console.log('Borre el id:'+ idCompraAEliminar);
+    return idCompraAEliminar;
 }
 exports.guardarGateway = async function(gatewayAGuardar){
-    var esquemaAuxiliar = new gateways(gatewayAGuardar);
+    var esquemaAuxiliar = new gateway(gatewayAGuardar);
     await esquemaAuxiliar.save(function(error,respuesta){
         if (error) {
             console.log(error);
@@ -47,12 +41,16 @@ exports.guardarGateway = async function(gatewayAGuardar){
         }
     });
 }
-exports.buscarGatewayPorCategoria = function(categoria){
-    var gatewayAuxiliar = mongoose.model('CategoriaCompraGatewayEsquema');
-    gatewayAuxiliar.findOne({ 'categoriaCompra': categoria}, 'nombreGateway', function (err, gateway) {
-        if (err) return handleError(err);
-        console.log('Gateway:'+ gateway.nombreGateway);
-      });
+exports.buscarURLGateway =async function(nombreGateway){
+    let gatewayAuxiliar = mongoose.model('URLGateway');
+    let consulta= await gatewayAuxiliar.findOne({ 'nombre': nombreGateway}).exec();
+    let URL=consulta.URL;
+    return URL;
+}
+exports.buscarNombreGateway= async function(idCompra){
+    let compraAuxiliar = mongoose.model('Compra');
+    let consulta= await compraAuxiliar.findOne({ '_id': idCompra}).exec();
+    return gateway;
 }
 
 
