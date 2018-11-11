@@ -7,9 +7,9 @@ var db = require('../Config/db');
 // Mongoose Configuration
 mongoose.Promise = global.Promise;
 
-exports.Conectar =   function (){ 
+exports.Conectar =async   function (){ 
     try {
-        mongoose.connect(db.url,
+        await mongoose.connect(db.url,
             { useNewUrlParser: true },)
             console.log('Connección a la base exitosa');
         }
@@ -17,9 +17,9 @@ exports.Conectar =   function (){
             console.log('Error al conectar a la base');
         }
 }
-exports.guardarCompra =  function(compraAGuardar){
-    var esquemaAuxiliar = new compra(compraAGuardar);
-       esquemaAuxiliar.save(function(err){
+exports.guardarCompra = async function(require){
+    var esquemaAuxiliar = new compra(req.body);
+       await esquemaAuxiliar.save(function(err){
         if (err) {
             throw new Error('Error al guardar la compra');
         } 
@@ -49,15 +49,10 @@ exports.guardarGateway = async function(gatewayAGuardar){
     });
 }
 exports.buscarGatewayPorCategoria= async function(categoria){
-    var gatewayAuxiliar = mongoose.model('CategoriaCompraGatewayEsquema');
-    await  gatewayAuxiliar.findOne({ 'categoriaCompra': categoria}, 'nombreGateway', function (err, gateway) {
-        if (err) {
-            return handleError(err);
-        }
-        else{
-        return gateway.nombreGateway;
-        }
-      });
+    let gatewayAuxiliar= await mongoose.model('CategoriaCompraGatewayEsquema');
+    let gateRetorno;
+    gateRetorno= await gatewayAuxiliar.findOne({ 'categoriaCompra': categoria}, 'nombreGateway').exec();
+    return gateRetorno.nombreGateway;
 }
 
 

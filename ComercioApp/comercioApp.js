@@ -1,9 +1,9 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
-const persistencia = require('./src/Persistencia/mongoDBConeccion');
-const servicios = require('./src/Servicios/compraRutas');
-const config = require('./src/Config/app');
+var express = require('express');
+var bodyParser = require('body-parser');
+var mongoose = require('mongoose');
+var persistencia = require('./src/Persistencia/mongoDBConeccion');
+var servicios = require('./src/Servicios/compraRutas');
+var config = require('./src/Config/app');
 //const gateway = require('./src/Modelo/CategoriaCompraGatewayEsquema');
 
 //Ver como dar de alta los gateway
@@ -22,7 +22,7 @@ try{
 } catch(error){
     console.log("Error al conectar"); 
 }
-app.listen(config.puerto, function() { 
+app.listen(config.PUERTO, function() { 
     console.log('App corriendo'); }).on('error', function(err) { 
         if (err) {
              console.log('Error al levantar la app'); 

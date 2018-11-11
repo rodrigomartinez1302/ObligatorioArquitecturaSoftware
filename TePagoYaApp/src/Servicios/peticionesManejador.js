@@ -1,73 +1,40 @@
 var axios = require('axios');
 var https = require('https');
-var persistencia= require("../Persistencia/mongoDBConeccion");
+var controlador= require("../Controlador/controladorTePagoYa");
+var configGateway= require("../Config/gateway");
+var configRed= require("../Config/red");
+var configEmisor= require("../Config/emisor");
 
-/*
-exports.buscarGatewayPorCategoria = function(categoria){
-    var gatewayAuxiliar = mongoose.model('CategoriaCompraGatewayEsquema');
-    gatewayAuxiliar.findOne({ 'categoriaCompra': categoria}, 'nombreGateway', function (err, gateway) {
-        if (err) return handleError(err);
-        console.log('Gateway:'+ gateway.nombreGateway);
-      });
-}
-*/
-/*
-exports.enviarCompraGateway = async (compraGuardada) => {
-    var response; 
-    try {
-        var compraEnviar={monto:compraGuardada.monto,fechaCompra:compraGuardada.fechaCompra
-            ,tarjeta:compraGuardada.tarjeta.numero};
-        response = await axios.post('http://localhost:10000/Compras',compraEnviar);
-        if(response.status=400){
-            console.log('Entre al status 400');
-            await persistencia.eliminarCompra(compraGuardada);
-          }
-          return response;
-    }catch (error){
-        await persistencia.eliminarCompra(compraGuardada);
-        console.log('Error al  enviar la petición');
-        return response;
-             } 
-
-        };
-        
-*/
-exports.enviarCompraGateway = async (compraGuardada) => { 
-    try {
-        let compraEnviar={monto:compraGuardada.monto,fechaCompra:compraGuardada.fechaCompra
-        ,tarjeta:compraGuardada.tarjeta.numero};
-        let response =await axios.post('http://localhost:10000/Compras',compraEnviar)
-        return response;
-    } catch (error) {
-        throw new handleError('Error al realizar la petición');
-    }
-};   
-exports.enviarCompraRed= async (compraGuardada) => { 
-    try {
-        let compraEnviar={monto:compraGuardada.monto,fechaCompra:compraGuardada.fechaCompra
-        ,tarjeta:compraGuardada.tarjeta.numero};
-        let response =await axios.post('http://localhost:11000/Compras',compraEnviar)
-        return response;
-    } catch (error) {
-        throw new handleError('Error al realizar la petición');
-    }
-};   
-exports.eliminarCompraGateway = async (compraGuardada) => { 
-    try {
-        let response =await axios.delete('http://localhost:10000/Compras',compraGuardada)
-        return response;
-    } catch (error) {
-        throw new Error('Error al realizar la petición');
-    }
+exports.enviarCompraGateway = async (req,URL) => { 
+    let compraEnviar={monto:req.body.monto,fechaCompra:req.body.fechaCompra
+        ,tarjeta:req.body.tarjeta.numero,RUT:req.body.RUT};
+        let respuesta= await axios.post(URL,compraEnviar);
+        return respuesta.data;
 };  
-exports.eliminarCompraRed = async (compraGuardada) => { 
-    try {
-        let response =await axios.delete('http://localhost:11000/Compras',compraGuardada)
-        return response;
-    } catch (error) {
-        throw new Error('Error al realizar la petición');
-    }
-};    
+exports.eliminarCompraGateway = async (idCompraAEliminar,URL) => { 
+    let respuesta= await axios.delete(URL+'/'+idCompraAEliminar);
+    return respuesta.data;
+};
+exports.enviarCompraRed= async (req) => { 
+    let compraEnviar={fechaCompra:req.body.fechaCompra
+        ,tarjeta:req.body.tarjeta.numero};
+    var respuesta= await axios.post(configRed.URL,compraEnviar);
+    return respuesta.data;
+};   
+exports.eliminarCompraRed = async (idCompraAEliminar) => {  
+    let respuesta= await axios.delete(configRed.URL+'/'+idCompraAEliminar);
+    return respuesta.data;
+};
+exports.enviarCompraEmisor= async (req) => { 
+    let compraEnviar={monto:req.body.monto,fechaCompra:req.body.fechaCompra
+        ,tarjeta:req.body.tarjeta.numero};
+    var respuesta = await axios.post(configEmisor.URL,compraEnviar);
+    return respuesta.data;
+};   
+exports.eliminarCompraEmisor = async (idCompraAEliminar) => {  
+    let respuesta =await axios.delete(configEmisor.URL+'/'+idCompraAEliminar);
+    return respuesta.data;
+};
 
 
     
