@@ -8,11 +8,7 @@ mongoose.Promise = global.Promise;
 
 exports.Conectar= async function (){ 
     try {
-<<<<<<< HEAD
         await mongoose.connect(configDB.url,
-=======
-        mongoose.connect(configDB.url,
->>>>>>> c51b9c289e691451397b38ae626339284da33249
             { useNewUrlParser: true },)
             console.log('Connección a la base exitosa');
         }
