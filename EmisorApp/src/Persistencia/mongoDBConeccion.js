@@ -7,15 +7,9 @@ var configapp = require('../Config/app');
 
 mongoose.Promise = global.Promise;
 
-<<<<<<< HEAD
 exports.Conectar= async function() { 
   try {
     await mongoose.connect(configDB.URL,
-=======
-exports.Conectar = function() { 
-  try {
-    mongoose.connect(configDB.URL,
->>>>>>> c51b9c289e691451397b38ae626339284da33249
       { useNewUrlParser: true },)
     console.log('Connección a la base exitosa');
   } catch(error) {
