@@ -35,8 +35,6 @@ exports.eliminarCompra =async function(req){
     await esquemaTarjeta.save();
     console.log('alta de tarjeta número: '+ esquemaTarjeta.numero);
 }
-
-
 exports.consultarTotalComprasEnTarjeta = async function(req){
     var hasta = new Date();
     var desde = new Date();
@@ -59,7 +57,6 @@ exports.consultarTotalComprasEnTarjeta = async function(req){
     ]);
     return resultado[0].suma;
 } 
-
 exports.consultarSaldoTarjeta =async function(req){
     let esquemaTarjeta = mongoose.model('Tarjeta');
     let consulta= await esquemaTarjeta.findOne({ 'numero': req.body.tarjeta}).exec();

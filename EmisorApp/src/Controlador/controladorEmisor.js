@@ -27,11 +27,9 @@ controlarSaldoTarjeta=async (req) => {
     //let saldo= await persistencia.consultarSaldoTarjeta(req);
     let acumulado = await persistencia.consultarTotalComprasEnTarjeta(req);
     let control= acumulado - req.body.monto > 0;
-
     if(control){
         return control;
     }
-
     throw new Error('Saldo insuficiente');
 }
 actualizarSaldoTarjeta=async (req) => {
