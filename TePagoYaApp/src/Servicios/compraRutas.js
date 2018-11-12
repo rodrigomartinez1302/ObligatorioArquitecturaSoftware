@@ -13,12 +13,21 @@ module.exports  = function(app,db) {
   });
   app.delete("/Compras/:id", async (req, res) => {
     try{
-    let respuesta= await controladorTePagoYa.enviarDenuncia(req);
+    let respuesta= await controladorTePagoYa.comunicacionDevolucion(req);
     res.status(200).send('idCompra eliminada: '+respuesta);
     }
     catch(error){
       res.status(500).send(error.message);
     }
+  });
+  app.post('/ChargeBack',async(req,res)=>{
+    try{
+      var respuesta= await controladorTePagoYa.comunicacionChargeBack(req);
+      res.status(200).send(respuesta);
+    }catch(error){
+      console.log(error.message);
+      res.status(500).send(error.message);
+  }
   });
 }
     

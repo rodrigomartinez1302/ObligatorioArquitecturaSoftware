@@ -1,5 +1,5 @@
-const persistencia= require("../Persistencia/mongoDBConeccion");
-const peticiones= require("../Servicios/peticionesManejador");
+const persistencia= require("../Persistencia/controladorDB");
+const peticiones= require("./controladorPeticiones");
 var controladorComercio= require("../Controlador/controladorComercio");
 
 module.exports  =  function(app,db) {
@@ -20,5 +20,14 @@ app.delete("/Compras/:id", async (req, res) => {
   catch(error){
     res.status(500).send(error.message);
   }
+});
+app.post('/ChargeBack',async(req,res)=>{
+  try{
+    var respuesta= await controladorComercio.enviarChargeTePagoYa(req);
+    res.status(200).send(respuesta);
+  }catch(error){
+    console.log(error.message);
+    res.status(500).send(error.message);
+}
 });
 }

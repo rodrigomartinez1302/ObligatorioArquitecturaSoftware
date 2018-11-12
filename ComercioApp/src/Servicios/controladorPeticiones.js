@@ -13,4 +13,9 @@ exports.enviarDenunciaTePagoYa = async (req) => {
     let respuesta =await axios.delete(configTePagoYa.URLCOMPRAS+'/'+idCompra);
     return respuesta.data;
 };
+exports.enviarChargeBackTePagoYa = async (req) => {  
+    let chargeBackEnviar= req.body;
+    var respuesta = await axios.post(configTePagoYa.URLCHARGEBACK,chargeBackEnviar);
+    return respuesta.data;
+};
 

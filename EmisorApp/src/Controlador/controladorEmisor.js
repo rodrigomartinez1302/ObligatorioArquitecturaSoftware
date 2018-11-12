@@ -1,5 +1,7 @@
 var persistencia= require("../Persistencia/mongoDBConeccion");
 var luhn = require('luhn-alg');
+var DateDiff = require('date-diff');
+var configApp=require('../Config/app');
 
 exports.guardarCompra = async (req) => {
     await controlarValidezTarjeta(req);
@@ -11,9 +13,22 @@ exports.guardarCompra = async (req) => {
     return idCompra;
 }; 
 exports.eliminarCompra = async (req) => {
+    //controlarCantidadDiasCompra(req);
     let idCompra=await persistencia.eliminarCompra(req);
     return idCompra;
 }; 
+controlarCantidadDiasCompra = async (req) => {
+    let fechaCompra = new Date(await persistencia.consultarFechaCompra(req.params.id));
+    let hoy = new Date();
+    let diasTranscurridos=DateDiff(fechaCompra,hoy);
+    console.log('fechaCompra'+fechaCompra);
+    console.log(hoy);
+    console.log(diasTranscurridos);
+    let control =  diasTranscurridos < configApp.DIASDEVOLUCION
+    if(!control){
+        throw new Error('Cantidad días superado');
+    }
+}
 controlarValidezTarjeta= (req) => {
     let control= luhn(req.body.tarjeta.toString());
     if(!control){
@@ -47,6 +62,11 @@ controlarDenunciadaTarjeta=async (req) => {
         throw new Error('Tarjeta denunciada');
     }
 }
+exports.guardarChargeBack = async (req) => {
+    var idCompra = await persistencia.guardarChargeBack(req);
+    return idCompra;
+}; 
+
 
 /*
 actualizarSaldoTarjeta=async (req) => {

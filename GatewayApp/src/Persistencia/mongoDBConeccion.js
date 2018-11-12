@@ -18,7 +18,7 @@ exports.Conectar= async function() {
 exports.guardarCompra = async function(req){
     var esquemaAuxiliar = new compra(req.body);
     await esquemaAuxiliar.save();
-    console.log('guarde el id:'+ esquemaAuxiliar._id);
+    console.log('IDCompra:'+ esquemaAuxiliar._id);
     return esquemaAuxiliar._id;
 }
 exports.eliminarCompra =async function(req){
@@ -26,7 +26,7 @@ exports.eliminarCompra =async function(req){
      if(!eliminado){
          throw new Error('No se encontró el id');
      }
-     console.log('Borre el id:'+ req.params.id);
+     console.log('IDCompra eliminado:'+ req.params.id);
      return req.params.id;
 }
  exports.cerrarLotes = function(fechaCierre,RUT){

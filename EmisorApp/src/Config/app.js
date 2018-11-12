@@ -1,4 +1,4 @@
 module.exports = {
     PUERTO : '12000',
-    diasDesdeTotalCompras:30,
+    DIASDEVOLUCION:30,
 }

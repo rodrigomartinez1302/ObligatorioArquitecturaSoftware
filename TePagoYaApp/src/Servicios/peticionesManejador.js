@@ -35,6 +35,12 @@ exports.eliminarCompraEmisor = async (idCompraAEliminar) => {
     let respuesta =await axios.delete(configEmisor.URLCOMPRAS+'/'+idCompraAEliminar);
     return respuesta.data;
 };
+exports.enviarChargeBackEmisor= async (idCompraEmisor) => { 
+    let chargeBackEnviar={idCompra:idCompraEmisor};
+    var respuesta = await axios.post(configEmisor.URLCHARGEBACK,chargeBackEnviar);
+    return respuesta.data;
+};
+
 
 
 

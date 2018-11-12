@@ -1,5 +1,5 @@
-const peticiones= require("../Servicios/peticionesManejador");
-var persistencia= require("../Persistencia/mongoDBConeccion");
+var peticiones= require("../Servicios/controladorPeticiones");
+var persistencia= require("../Persistencia/controladorDB");
 
 exports.enviarCompraTePagoYa = async (req) => {
     let compraAEnviar= await seleccionarGateway(req);
@@ -15,5 +15,9 @@ seleccionarGateway = async (req) => {
 };  
 exports.enviarDenunciaTePagoYa = async (req) => {
     var respuesta= await peticiones.enviarDenunciaTePagoYa(req);
+    return respuesta;
+}; 
+exports.enviarChargeTePagoYa = async (req) => {
+    var respuesta= await peticiones.enviarChargeBackTePagoYa(req);
     return respuesta;
 }; 
