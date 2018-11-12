@@ -1,6 +1,6 @@
 var axios = require('axios');
 var https = require('https');
-var controlador= require("../Controlador/controladorTePagoYa");
+//var controlador= require("../Controlador/controladorTePagoYa");
 var configGateway= require("../Config/gateway");
 var configRed= require("../Config/red");
 var configEmisor= require("../Config/emisor");
@@ -18,23 +18,24 @@ exports.eliminarCompraGateway = async (idCompraAEliminar,URL) => {
 exports.enviarCompraRed= async (req) => { 
     let compraEnviar={fechaCompra:req.body.fechaCompra
         ,tarjeta:req.body.tarjeta.numero};
-    var respuesta= await axios.post(configRed.URL,compraEnviar);
+    var respuesta= await axios.post(configRed.URLCOMPRAS,compraEnviar);
     return respuesta.data;
 };   
 exports.eliminarCompraRed = async (idCompraAEliminar) => {  
-    let respuesta= await axios.delete(configRed.URL+'/'+idCompraAEliminar);
+    let respuesta= await axios.delete(configRed.URLCOMPRAS+'/'+idCompraAEliminar);
     return respuesta.data;
 };
 exports.enviarCompraEmisor= async (req) => { 
     let compraEnviar={monto:req.body.monto,fechaCompra:req.body.fechaCompra
         ,tarjeta:req.body.tarjeta.numero};
-    var respuesta = await axios.post(configEmisor.URL,compraEnviar);
+    var respuesta = await axios.post(configEmisor.URLCOMPRAS,compraEnviar);
     return respuesta.data;
 };   
 exports.eliminarCompraEmisor = async (idCompraAEliminar) => {  
-    let respuesta =await axios.delete(configEmisor.URL+'/'+idCompraAEliminar);
+    let respuesta =await axios.delete(configEmisor.URLCOMPRAS+'/'+idCompraAEliminar);
     return respuesta.data;
 };
+
 
 
     

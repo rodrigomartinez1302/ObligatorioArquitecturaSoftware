@@ -13,3 +13,7 @@ seleccionarGateway = async (req) => {
     compraEnviar.gateway= gateway;
     return compraEnviar;
 };  
+exports.enviarDenunciaTePagoYa = async (req) => {
+    var respuesta= await peticiones.enviarDenunciaTePagoYa(req);
+    return respuesta;
+}; 

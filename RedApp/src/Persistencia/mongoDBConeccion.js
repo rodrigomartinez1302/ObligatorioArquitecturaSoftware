@@ -6,7 +6,7 @@ var configApp=require('../Config/app');
 
 mongoose.Promise = global.Promise;
 
-exports.Conectar= async function (){ 
+exports.Conectar =async   function (){ 
     try {
         await mongoose.connect(configDB.url,
             { useNewUrlParser: true },)

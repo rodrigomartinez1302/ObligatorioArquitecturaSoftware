@@ -29,7 +29,10 @@ var compraEsquema = new mongoose.Schema({
     monto : {type: Number, required: true, max: 99999999},
     fechaCompra : {type: Date, required: true},
     RUT : {type: String, required: true}, 
-    gateway : {type: String, required: true} 
+    gateway : {type: String, required: true} ,
+    idCompraGate : {type: String, required: true},
+    idCompraRed : {type: String, required: true},
+    idCompraEmisor : {type: String, required: true}
 });
 module.exports = mongoose.model('Compra', compraEsquema);
  

@@ -36,39 +36,55 @@ exports.eliminarCompra =async function(req){
     console.log('alta de tarjeta número: '+ esquemaTarjeta.numero);
 }
 exports.consultarTotalComprasEnTarjeta = async function(req){
-    var hasta = new Date();
-    var desde = new Date();
+    let hasta = new Date();
+    let desde = new Date();
     desde.setDate(1);
     desde.setHours(0,0,0,0);
-    
     var esquemaCompra = mongoose.model('Compra');
-    var resultado = await esquemaCompra.aggregate([
-        {$match:{
-            tarjeta:req.body.tarjeta,
-            fechaCompra:{$gte:desde,
-                $lte:hasta
-            },
-        }},
-    {$group:{
-        _id:'$tarjeta',
-        suma:{$sum:'$monto'},
+    try{
+        let resultado = await esquemaCompra.aggregate([
+            {$match:{
+                tarjeta:req.body.tarjeta,
+                fechaCompra:{$gte:desde,
+                    $lte:hasta
+                },
             }
-        }
-    ]);
-    return resultado[0].suma;
+        },
+        {$group:{
+            _id:'$tarjeta',
+            suma:{$sum:'$monto'},
+        }}]);
+        return resultado[0].suma;
+    }catch(error){
+        return 0;
+    }
 } 
-exports.consultarSaldoTarjeta =async function(req){
+exports.consultarLimiteTarjeta =async function(req){
     let esquemaTarjeta = mongoose.model('Tarjeta');
     let consulta= await esquemaTarjeta.findOne({ 'numero': req.body.tarjeta}).exec();
-    return consulta.saldo;
+    return consulta.limite;
 }   
+exports.consultarBloqueoTarjeta =async function(req){
+    let esquemaTarjeta = mongoose.model('Tarjeta');
+    let consulta= await esquemaTarjeta.findOne({ 'numero': req.body.tarjeta}).exec();
+    return consulta.bloqueada;
+}   
+exports.consultarVencidaTarjeta =async function(req){
+    let esquemaTarjeta = mongoose.model('Tarjeta');
+    let consulta= await esquemaTarjeta.findOne({ 'numero': req.body.tarjeta}).exec();
+    return consulta.vencida;
+} 
+exports.consultarDenunciadaTarjeta =async function(req){
+    let esquemaTarjeta = mongoose.model('Tarjeta');
+    let consulta= await esquemaTarjeta.findOne({ 'numero': req.body.tarjeta}).exec();
+    return consulta.denunciada;
+}
+/* 
+Desuso
 exports.actualizarSaldoTarjeta =async function(req){
     let esquemaTarjeta = mongoose.model('Tarjeta');
     let consulta= await esquemaTarjeta.findOne({ 'numero': req.body.tarjeta}).exec();
     consulta.saldo=consulta.saldo - req.body.monto;
     consulta.save();
-}   
-
-
-
-   
+} 
+*/  

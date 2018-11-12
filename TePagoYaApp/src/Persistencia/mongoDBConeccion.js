@@ -50,8 +50,24 @@ exports.buscarURLGateway =async function(nombreGateway){
 exports.buscarNombreGateway= async function(idCompra){
     let compraAuxiliar = mongoose.model('Compra');
     let consulta= await compraAuxiliar.findOne({ '_id': idCompra}).exec();
-    return gateway;
+    return consulta.gateway;
 }
+exports.consultarIDCompraEmisor =async function(idCompra){
+    let compraAuxiliar = mongoose.model('Compra');
+    let consulta= await compraAuxiliar.findOne({ '_id': idCompra}).exec();
+    return consulta.idCompraEmisor;
+} 
+exports.consultarIDCompraRed =async function(idCompra){
+    let compraAuxiliar = mongoose.model('Compra');
+    let consulta= await compraAuxiliar.findOne({ '_id': idCompra}).exec();
+    return consulta.idCompraRed;
+} 
+exports.consultarIDCompraGateway =async function(idCompra){
+    let compraAuxiliar = mongoose.model('Compra');
+    let consulta= await compraAuxiliar.findOne({ '_id': idCompra}).exec();
+    return consulta.idCompraGate;
+} 
+
 
 
 

@@ -29,7 +29,6 @@ exports.eliminarCompra =async function(req){
      console.log('Borre el id:'+ req.params.id);
      return req.params.id;
 }
-
  exports.cerrarLotes = function(fechaCierre,RUT){
     var esquemaAuxiliar = mongoose.model('Compra');
     var hoy = new Date();

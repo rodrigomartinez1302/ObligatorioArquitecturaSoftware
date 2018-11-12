@@ -1,3 +1,3 @@
 module.exports = {
-    URL : 'http://localhost:11000/Compras'
+    URLCOMPRAS : 'http://localhost:11000/Compras'
 }

@@ -12,4 +12,13 @@ module.exports  =  function(app,db) {
       res.status(500).send(error.message);
   }
 });
+app.delete("/Compras/:id", async (req, res) => {
+  try{
+  let idCompra= await controladorComercio.enviarDenunciaTePagoYa(req);
+  res.status(200).send(idCompra);
+  }
+  catch(error){
+    res.status(500).send(error.message);
+  }
+});
 }
