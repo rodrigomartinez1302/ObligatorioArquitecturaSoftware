@@ -34,7 +34,7 @@ exports.eliminarCompra = async function(req){
  exports.altaTarjeta = async function(altatarjeta){
     let esquemaTarjeta= new tarjeta(altatarjeta);
     await esquemaTarjeta.save();
-    console.log('número tarjeta: '+ esquemaTarjeta.numero);
+    console.log('número tarjeta: '+ esquemaTarjeta.numero);   
 }
 exports.consultarTotalComprasEnTarjeta = async function(req){
     let hasta = new Date();
