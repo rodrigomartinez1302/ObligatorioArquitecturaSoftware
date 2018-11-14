@@ -1,5 +1,4 @@
 var axios = require('axios');
-var https = require('https');
 //var controlador= require("../Controlador/controladorTePagoYa");
 var configGateway= require("../Config/gateway");
 var configRed= require("../Config/red");

@@ -25,10 +25,3 @@ app.listen(config.PUERTO, function() {
     });
 
 
-//let tarjeta={saldo: 300000 ,limite: 300000,numero: 4242424242424242, vencida:false, bloqueada: false,denunciada: false };
-//let tarjeta={saldo: 300000 ,limite: 300000,numero: 5232449742219221, vencida:false, bloqueada: false,denunciada: false };
-//persistencia.altaTarjeta(tarjeta);
-//persistencia.consultarTotalCompras(4242424242424242);//,'2018-11-01');
-//console.log(total);
-//persistencia.consultarSaldo(4242424242424242);
-//persistencia.actualizarSaldo(4242424242424242,123);

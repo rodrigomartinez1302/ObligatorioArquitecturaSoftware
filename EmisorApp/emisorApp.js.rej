@@ -1,9 +1,0 @@
-diff a/EmisorApp/emisorApp.js b/EmisorApp/emisorApp.js	(rejected hunks)
-@@ -25,6 +25,7 @@
-     });
- 
- 
-+//let tarjeta={saldo: 300000 ,limite: 300000,numero: 5232449742219221, vencida:false, bloqueada: false,denunciada: false };
- //persistencia.altaTarjeta(tarjeta);
- //persistencia.consultarTotalCompras(4242424242424242);//,'2018-11-01');
- //console.log(total);
