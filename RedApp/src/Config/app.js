@@ -1,5 +1,5 @@
 module.exports = {
-    puerto : '11000',
-    diasControlFraude:3,
-    cantidadTrxs:18
+    PUERTO : '11000',
+    DIASCONTROLFRAUDE:3,
+    CANTIDADTRX:18
 }

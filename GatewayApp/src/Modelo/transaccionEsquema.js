@@ -1,10 +1,10 @@
 var mongoose = require('mongoose');
 
-var compraEsquema = new mongoose.Schema({
+var transaccionEsquema = new mongoose.Schema({
     monto : {type: Number, required: true, max: 99999999},
-    fechaCompra : {type: Date, required: true},
+    fechaTransaccion : {type: Date, required: true},
     tarjeta : {type: Number, required: true},
     RUT : {type: String, required: true}  
 });
 
-module.exports = mongoose.model('Compra', compraEsquema);
+module.exports = mongoose.model('Transaccion', transaccionEsquema);

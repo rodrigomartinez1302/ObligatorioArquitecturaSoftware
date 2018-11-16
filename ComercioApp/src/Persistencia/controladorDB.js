@@ -1,10 +1,9 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-var compra= require('../Modelo/compraEsquema.js');
-var gateways= require('../Modelo/categoriaCompraGatewayEsquema.js');
+var transaccion= require('../Modelo/TransaccionEsquema.js');
+var gateway= require('../Modelo/categoriaTransaccionGatewayEsquema.js');
 var db = require('../Config/db');
 
-// Mongoose Configuration
 mongoose.Promise = global.Promise;
 
 exports.Conectar =async   function (){ 
@@ -17,73 +16,37 @@ exports.Conectar =async   function (){
             console.log('Error al conectar a la base');
         }
 }
-exports.guardarCompra = async function(require){
-    var esquemaAuxiliar = new compra(req.body);
+exports.guardarTransaccion = async function(require){
+    var esquemaAuxiliar = new transaccion(req.body);
        await esquemaAuxiliar.save(function(err){
         if (err) {
-            throw new Error('Error al guardar la compra');
+            throw new Error('Error al guardar la Transaccion');
         } 
         else{
-            console.log('Se guardó la compra con id '+ esquemaAuxiliar._id);
+            console.log('Se guardó la Transaccion con id '+ esquemaAuxiliar._id);
         }
     });
     return esquemaAuxiliar; 
 }
-exports.eliminarCompra = function(compraAEliminar){
-    compra.deleteOne({ _id: compraAEliminar._id }, function (err) {
+exports.eliminarTransaccion = function(transaccionAEliminar){
+    transaccion.deleteOne({ _id: transaccionAEliminar._id }, function (err) {
         if (err) {
-            throw new Error('No se encontró la compra');
+            throw new Error('No se encontró la Transaccion');
         }
       });
-      console.log('Se eliminó la compra');
+      console.log('Se eliminó la Transaccion');
 }
 exports.guardarGateway = async function(gatewayAGuardar){
-    var esquemaAuxiliar = new gateways(gatewayAGuardar);
+    var esquemaAuxiliar = new gateway(gatewayAGuardar);
     await esquemaAuxiliar.save(function(error,respuesta){
         if (error) {
-            console.log(error);
-        }
-        else{
-            console.log(respuesta);
+            throw new Error('Error al guardar el gateway');
         }
     });
 }
 exports.buscarGatewayPorCategoria= async function(categoria){
-    let gatewayAuxiliar= await mongoose.model('CategoriaCompraGatewayEsquema');
+    let gatewayAuxiliar= await mongoose.model('CategoriaTransaccionGatewayEsquema');
     let gateRetorno;
-    gateRetorno= await gatewayAuxiliar.findOne({ 'categoriaCompra': categoria}, 'nombreGateway').exec();
+    gateRetorno= await gatewayAuxiliar.findOne({ 'categoriaTransaccion': categoria}, 'nombreGateway').exec();
     return gateRetorno.nombreGateway;
 }
-
-
-
-
-
-
-
-/*
-var GuardarTarjeta = function( a/*ca pasari aun json con los datos tarjetaAguardar){
-    console.log('Entramos');
-    const tarjetaAGuardar={numero:1234,vencimiento:'12/12/2018',nombreTitular:'Nombre',codigoSeguridad:1234}
-    
-    const esquemaprueba = new tarjetaEsquema(tarjetaAGuardar);
-    esquemaprueba.save(function(error,respuesta){
-        if (error) {
-            console.log(error);
-        }
-        else{
-            console.log(respuesta);
-        }
-    });
-}
-
-
-*/
-//module.exports = mongoose.model('Compra', compraEsquema);
-//module.exports = mongoose.model('Tarjeta', tarjetaEsquema);
-//module.exports = mongoose.model('Producto', productoEsquema);
-//module.exports = mongoose.model('DireccionEnvioEsquema', direccionEnvioEsquema);
-
-
-
-

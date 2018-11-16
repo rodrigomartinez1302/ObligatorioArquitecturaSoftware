@@ -1,23 +1,23 @@
 var peticiones= require("../Servicios/controladorPeticiones");
 var persistencia= require("../Persistencia/controladorDB");
 
-exports.enviarCompraTePagoYa = async (req) => {
-    let compraAEnviar= await seleccionarGateway(req);
-    req.body=compraAEnviar;
-    var respuesta= await peticiones.enviarCompraTePagoYa(req);
+exports.enviarTransaccionTePagoYa = async (req) => {
+    let transaccionAEnviar = await seleccionarGateway(req);
+    req.body = transaccionAEnviar;
+    var respuesta= await peticiones.enviarTransaccionTePagoYa(req);
     return respuesta;
 };   
 seleccionarGateway = async (req) => {
-    let compraEnviar= req.body;
-    let gateway= await persistencia.buscarGatewayPorCategoria(req.body.producto.categoria)
-    compraEnviar.gateway= gateway;
-    return compraEnviar;
+    let transaccionEnviar = req.body;
+    let gateway = await persistencia.buscarGatewayPorCategoria(req.body.producto.categoria)
+    transaccionEnviar.gateway= gateway;
+    return transaccionEnviar;
 };  
-exports.enviarDenunciaTePagoYa = async (req) => {
-    var respuesta= await peticiones.enviarDenunciaTePagoYa(req);
+exports.enviarDevolucionTePagoYa = async (req) => {
+    var respuesta = await peticiones.enviarDevolucionTePagoYa(req);
     return respuesta;
 }; 
 exports.enviarChargeTePagoYa = async (req) => {
-    var respuesta= await peticiones.enviarChargeBackTePagoYa(req);
+    var respuesta = await peticiones.enviarChargeBackTePagoYa(req);
     return respuesta;
 }; 

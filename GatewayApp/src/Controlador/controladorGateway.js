@@ -1,11 +1,11 @@
 var persistencia= require("../Persistencia/mongoDBConeccion");
  
-exports.guardarCompra = async (req) => {
-    var idCompra=await persistencia.guardarCompra(req);
-    return idCompra;
+exports.guardarTransaccion = async (req) => {
+    var idTransaccion=await persistencia.guardarTransaccion(req);
+    return idTransaccion;
 }; 
-exports.eliminarCompra = async (req) => {
-    var idCompra=await persistencia.eliminarCompra(req);
-    return idCompra;
+exports.revertirTransaccion = async (req) => {
+    var idTransaccion=await persistencia.eliminarTransaccion(req);
+    return idTransaccion;
 }; 
 

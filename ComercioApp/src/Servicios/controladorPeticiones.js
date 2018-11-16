@@ -2,15 +2,15 @@ var axios = require('axios');
 var configTePagoYa= require("../Config/tePagoYa");
 var configApp= require("../Config/app");
 
-exports.enviarCompraTePagoYa = async (req) => {
-    let compraEnviar= req.body;
-    compraEnviar.RUT=configApp.RUT;
-    var respuesta = await axios.post(configTePagoYa.URLCOMPRAS,compraEnviar);
+exports.enviarTransaccionTePagoYa = async (req) => {
+    let transaccionEnviar= req.body;
+    transaccionEnviar.RUT=configApp.RUT;
+    var respuesta = await axios.post(configTePagoYa.URLTRANSACCION,transaccionEnviar);
     return respuesta.data;
 };
-exports.enviarDenunciaTePagoYa = async (req) => {  
-    let idCompra=req.params.id;
-    let respuesta =await axios.delete(configTePagoYa.URLCOMPRAS+'/'+idCompra);
+exports.enviarDevolucionTePagoYa = async (req) => {  
+    let devolucionEnviar=req.body;
+    let respuesta =await axios.put(configTePagoYa.URLTRANSACCION,devolucionEnviar);
     return respuesta.data;
 };
 exports.enviarChargeBackTePagoYa = async (req) => {  

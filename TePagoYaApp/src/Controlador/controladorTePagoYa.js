@@ -1,157 +1,159 @@
-var peticiones= require("../Servicios/peticionesManejador");
+var peticiones= require("../Servicios/controladorPeticiones");
 var persistencia= require("../Persistencia/mongoDBConeccion");
-var idCompraGateWay;
-var idCompraRed;
-var idCompraEmisor;
-var idCompraTePagoYa;
+var idTransaccionGateWay;
+var idTransaccionRed;
+var idTransaccionEmisor;
+var idTransaccionTePagoYa;
 
-exports.comunicacionCompra= async (req) => {
+exports.comunicacionTransaccion= async (req) => {
     try{
-        let respuesta= await comunicacionCompraGateway(req);
-        idCompraGateWay=respuesta;
+        let respuesta= await comunicacionTransaccionGateway(req);
+        idTransaccionGateWay=respuesta;
     }catch(error){
         console.error(error.message);
         throw new Error(error.respuesta);
     }
     try{
-        let respuesta= await comunicacionCompraRed(req);
-        idCompraRed=respuesta;
+        let respuesta= await comunicacionTransaccionRed(req);
+        idTransaccionRed=respuesta;
     }catch(error){
-        let idborradoGate=await revertirCompraGateway(req.body.gateway,idCompraGateWay);
+        let idborradoGate=await revertirTransaccionGateway(req.body.gateway,idTransaccionGateWay);
         console.error(error.message);
         throw new Error(error.respuesta);
     }
     try{
-        let respuesta= await comunicacionCompraEmisor(req);
-        idCompraEmisor=respuesta;
+        let respuesta= await comunicacionTransaccionEmisor(req);
+        idTransaccionEmisor=respuesta;
     }catch(error){
-        let idborradoGate= await revertirCompraGateway(req.body.gateway,idCompraGateWay);
-        let idborradoRed= await revertirCompraRed(idCompraRed);
+        let idborradoGate= await revertirTransaccionGateway(req.body.gateway,idTransaccionGateWay);
+        let idborradoRed= await revertirTransaccionRed(idTransaccionRed);
         console.error(error.message);
         throw new Error(error.respuesta);
     }
     try{
         //throw new Error('Probando el roll back');
-        idCompraTePagoYa= await guardarCompra(req);
+        idTransaccionTePagoYa= await guardarTransaccion(req);
     }catch(error){
-        let idborradoGate= await revertirCompraGateway(req,idCompraGateWay);
-        let idborradoRed= await revertirCompraRed(idCompraRed);
-        let idborradoEmisor= await revertirCompraEmisor(idCompraEmisor);
+        let idborradoGate= await revertirTransaccionGateway(req,idTransaccionGateWay);
+        let idborradoRed= await revertirTransaccionRed(idTransaccionRed);
+        let idborradoEmisor= await revertirTransaccionEmisor(idTransaccionEmisor);
         console.log(error);
         throw new Error(error.respuesta.data);
     }
-    return idCompraTePagoYa;
+    return idTransaccionTePagoYa;
 };   
 exports.buscarURLGateway = async (nombreGate) => {
     let URL= await persistencia.buscarURLGateway(nombreGate);
     return URL;
 }; 
-comunicacionCompraGateway= async (req) => {
+comunicacionTransaccionGateway= async (req) => {
     let URL= await buscarURLGateway(req.body.gateway);
-    let respuesta=await peticiones.enviarCompraGateway(req,URL);
+    let respuesta=await peticiones.enviarTransaccionGateway(req,URL);
     return respuesta;
 };
-revertirCompraGateway= async (nombreGate) => {
+revertirTransaccionGateway= async (nombreGate) => {
     let URL= await buscarURLGateway(nombreGate);
-    let respuesta= await peticiones.eliminarCompraGateway(idCompraGateWay,URL);
+    let respuesta= await peticiones.revertirTransaccionGateway(idTransaccionGateWay,URL);
     return respuesta;
 };
 buscarURLGateway= async (nombreGate) => {
     let URL= await persistencia.buscarURLGateway(nombreGate);
     return URL;
 };
-comunicacionCompraRed= async (req) => {
-    let respuesta=await peticiones.enviarCompraRed(req);
+comunicacionTransaccionRed= async (req) => {
+    let respuesta=await peticiones.enviarTransaccionRed(req);
     return respuesta;
 };
-revertirCompraRed= async (idCompraEliminar) => {
-    let respuesta=await peticiones.eliminarCompraRed(idCompraEliminar);
+revertirTransaccionRed= async (idTransaccionEliminar) => {
+    let respuesta=await peticiones.revertirTransaccionRed(idTransaccionEliminar);
     return respuesta;
 };
-comunicacionCompraEmisor= async (req) => {
-    let respuesta=await peticiones.enviarCompraEmisor(req);
+comunicacionTransaccionEmisor= async (req) => {
+    let respuesta=await peticiones.enviarTransaccionEmisor(req);
     return respuesta;
 }; 
-revertirCompraEmisor= async (idCompraEliminar) => {y
-    let respuesta=await peticiones.eliminarCompraEmisor(idCompraEliminar);
+revertirTransaccionEmisor= async (idTransaccionEliminar) => {
+    let respuesta=await peticiones.revertirTransaccionEmisor(idTransaccionEliminar);
     return respuesta;
 };
-guardarCompra = async (req) => {
-    req.body.idCompraGate = idCompraGateWay;
-    req.body.idCompraRed = idCompraRed;
-    req.body.idCompraEmisor = idCompraEmisor;
-    let idCompra= await persistencia.guardarCompra(req);
-    return idCompra;
+guardarTransaccion = async (req) => {
+    req.body.idTransaccionGate = idTransaccionGateWay;
+    req.body.idTransaccionRed = idTransaccionRed;
+    req.body.idTransaccionEmisor = idTransaccionEmisor;
+    let idTransaccion = await persistencia.guardarTransaccion(req);
+    return idTransaccion;
 }; 
-eliminarCompra = async (idComraAEliminarTePagoYa) => {
-    let idCompra= await persistencia.eliminarCompra(idComraAEliminarTePagoYa);
-    return idCompra;
+revertirTransaccion = async (idComraAEliminarTePagoYa) => {
+    let idTransaccion = await persistencia.eliminarTransaccion(idComraAEliminarTePagoYa);
+    return idTransaccion;
 }; 
-exports.comunicacionDevolucion= async (req) => {
-    idCompraTePagoYa = req.params.id;
+/*
+exports.comunicacionRevertirTransaccion = async (req) => {
+    idTransaccionTePagoYa = req.params.id;
     try{
-        let respuesta = await comunicacionDevolucionEmisor(req);
-        idCompraEmisor=respuesta;
+        let respuesta = await comunicacionRevertirTransaccionEmisor(req);
+        idTransaccionEmisor = respuesta;
     }catch(error){
         console.log(error.respuesta);
         throw new Error(error.respuesta);
     }
     try{
-        let respuesta = await comunicacionDevolucionRed(req);
-        idCompraRed=respuesta;
+        let respuesta = await comunicacionRevertirTransaccionRed(req);
+        idTransaccionRed=respuesta;
     }catch(error){
         console.log(error.respuesta);
         throw new Error(error.respuesta);
     }
     try{
-        let respuesta = await comunicacionDevolucionGateway(req);
-        idCompraGateWay=respuesta;
+        let respuesta = await comunicacionRevertirTransaccionGateway(req);
+        idTransaccionGateWay=respuesta;
     }catch(error){
         throw new Error(error.respuesta);
     }
-    return idCompraTePagoYa;
+    return idTransaccionTePagoYa;
 };  
-comunicacionDevolucionEmisor= async (req) => {
-    await consultarIDCompraEmisor(idCompraTePagoYa);
-    let respuesta= await revertirCompraEmisor(idCompraEmisor);
+*/
+comunicacionRevertirTransaccionEmisor= async (req) => {
+    await consultarIDTransaccionEmisor(idTransaccionTePagoYa);
+    let respuesta= await revertirTransaccionEmisor(idTransaccionEmisor);
     return respuesta;
 };
-comunicacionDevolucionRed= async (req) => {
-    await consultarIDCompraRed(idCompraTePagoYa);
-    let respuesta= await revertirCompraRed(idCompraRed);
+comunicacionRevertirTransaccionRed= async (req) => {
+    await consultarIDTransaccionRed(idTransaccionTePagoYa);
+    let respuesta= await revertirTransaccionRed(idTransaccionRed);
     return respuesta;
 };
-comunicacionDevolucionGateway= async (req) => {
-    await consultarIDCompraGateway(idCompraTePagoYa);
-    let nombreGate = await buscarNombreGateway(idCompraTePagoYa);
-    let respuesta = await revertirCompraGateway(nombreGate);
+comunicacionRevertirTransaccionGateway= async (req) => {
+    await consultarIDTransaccionGateway(idTransaccionTePagoYa);
+    let nombreGate = await buscarNombreGateway(idTransaccionTePagoYa);
+    let respuesta = await revertirTransaccionGateway(nombreGate);
     return respuesta;
 };
-consultarIDCompraEmisor= async (idCompra) => {
-    idCompraEmisor = await persistencia.consultarIDCompraEmisor(idCompra);
+consultarIDTransaccionEmisor= async (idTransaccion) => {
+    idTransaccionEmisor = await persistencia.consultarIDTransaccionEmisor(idTransaccion);
 };
-consultarIDCompraRed= async (idCompra) => {
-    idCompraRed = await persistencia.consultarIDCompraRed(idCompra);
+consultarIDTransaccionRed= async (idTransaccion) => {
+    idTransaccionRed = await persistencia.consultarIDTransaccionRed(idTransaccion);
 };
-consultarIDCompraGateway= async (idCompra) => {
-    idCompraGateWay = await persistencia.consultarIDCompraGateway(idCompra);
+consultarIDTransaccionGateway= async (idTransaccion) => {
+    idTransaccionGateWay = await persistencia.consultarIDTransaccionGateway(idTransaccion);
 };
-buscarNombreGateway = async (idCompra) => {
-    let gateway = await persistencia.buscarNombreGateway(idCompra);
+buscarNombreGateway = async (idTransaccion) => {
+    let gateway = await persistencia.buscarNombreGateway(idTransaccion);
     return gateway;
 };
 exports.comunicacionChargeBack =  async (req) => {
     try{
         let respuesta = await comunicacionChargeBackEmisor(req);
-        idCompraEmisor=respuesta;
+        idTransaccionEmisor=respuesta;
     }catch(error){
         console.log(error.respuesta);
         throw new Error(error.respuesta);
     }
 }
 comunicacionChargeBackEmisor= async (req) => {
-    idCompraEmisor = await persistencia.consultarIDCompraEmisor(req.body.idCompra);
-    let respuesta = await peticiones.enviarChargeBackEmisor(idCompraEmisor);
+    idTransaccionEmisor = await persistencia.consultarIDTransaccionEmisor(req.body.idTransaccion);
+    let respuesta = await peticiones.enviarChargeBackEmisor(idTransaccionEmisor);
     return respuesta;
 };
 

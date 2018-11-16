@@ -1,19 +1,19 @@
 var controladorGateway= require("../Controlador/controladorGateway");
 
 module.exports = function (app, db) {
-  app.post('/Compras', async (req, res) => {
+  app.post('/Transacciones', async (req, res) => {
       try{
-      let idCompra= await controladorGateway.guardarCompra(req);
-      res.status(200).send(idCompra);
+      let idTransaccion= await controladorGateway.guardarTransaccion(req);
+      res.status(200).send(idTransaccion);
       }catch(error){
         console.log(error.message);
         res.status(500).send(error.message);
       }
     });
-    app.delete("/Compras/:id", async (req, res) => {
+    app.delete("/Transacciones/:id", async (req, res) => {
         try{
-        let idCompra= await controladorGateway.eliminarCompra(req);
-        res.status(200).send(idCompra);
+        let idTransaccion= await controladorGateway.revertirTransaccion(req);
+        res.status(200).send(idTransaccion);
         }
         catch(error){
           res.status(500).send(error.message);

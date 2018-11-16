@@ -1,4 +1,4 @@
 module.exports = {
-    URLCOMPRAS : 'http://localhost:9000/Compras',
-    URLCHARGEBACK : 'http://localhost:9000/ChargeBack'
+    URLTRANSACCION : 'http://localhost:9000/Transacciones',
+    URLCHARGEBACK : 'http://localhost:9000/ChargeBacks'
 }

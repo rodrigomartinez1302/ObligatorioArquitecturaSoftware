@@ -2,14 +2,14 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var persistencia = require('./src/Persistencia/controladorDB');
-var servicios = require('./src/Servicios/compraRutas');
+var servicios = require('./src/Servicios/transaccionRutas');
 var config = require('./src/Config/app');
 
 //Ver como dar de alta los gateway
-//const auxGateway={categoriaCompra:'Ropa',nombreGateway:'gateway1'}
+//const auxGateway={categoriaTransaccion:'Electrodomésticos',nombreGateway:'gateway2'}
 //console.log(auxGateway);
 //persistencia.guardarGateway(auxGateway);
-// Express Configuration
+
 const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));

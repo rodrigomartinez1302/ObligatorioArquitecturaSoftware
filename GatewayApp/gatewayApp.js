@@ -1,8 +1,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var persistencia = require('./src/Persistencia/mongoDBConeccion');
-var servicios = require('./src/Servicios/compraRutas');
-var compraEsquema = require('./src/Modelo/compraEsquema');
+var servicios = require('./src/Servicios/transaccionRutas');
 var config = require('./src/Config/app');
 
 

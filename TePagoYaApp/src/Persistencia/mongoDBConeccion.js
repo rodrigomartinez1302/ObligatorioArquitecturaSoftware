@@ -1,14 +1,14 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var db = require('../Config/db');
-var compra= require('../Modelo/compraEsquema');
-var gateway= require('../Modelo/URLGateWayEsquema');
+var transaccion = require('../Modelo/transaccionEsquema');
+var gateway = require('../Modelo/URLGateWayEsquema');
 
 mongoose.Promise = global.Promise;
 
-exports.Conectar= async function (){ 
+exports.Conectar = async function (){ 
     try {
-        await mongoose.connect(db.url,
+        await mongoose.connect(db.URL,
             { useNewUrlParser: true },)
             console.log('Connección a la base exitosa');
         }
@@ -16,20 +16,19 @@ exports.Conectar= async function (){
             console.log('Error al conectar a la base');
         }
 }
-//Estos dos metodos moverlos a un aquete controlador
-exports.guardarCompra =async function(req){
-   var esquemaAuxiliar = new compra(req.body);
+exports.guardarTransaccion =async function(req){
+   var esquemaAuxiliar = new transaccion(req.body);
    await esquemaAuxiliar.save();
-   console.log('IDCompra:'+ esquemaAuxiliar._id);
+   console.log('IDtransaccion:'+ esquemaAuxiliar._id);
    return esquemaAuxiliar._id;
  }   
- exports.eliminarCompra =async function(idCompraAEliminar){
-    let eliminado=await compra.findByIdAndDelete(idCompraAEliminar);
+ exports.eliminarTransaccion = async function(idTransaccionAEliminar){
+    let eliminado = await Transaccion.findByIdAndDelete(idTransaccionAEliminar);
     if(!eliminado){
-        throw new Error('No se encontró el id');
+        throw new Error('No se encontró el ID');
     }
-    console.log('IDCompra eliminado:'+ idCompraAEliminar);
-    return idCompraAEliminar;
+    console.log('IDTransaccion eliminado:'+ idTransaccionAEliminar);
+    return idTransaccionAEliminar;
 }
 exports.guardarGateway = async function(gatewayAGuardar){
     var esquemaAuxiliar = new gateway(gatewayAGuardar);
@@ -42,31 +41,31 @@ exports.guardarGateway = async function(gatewayAGuardar){
         }
     });
 }
-exports.buscarURLGateway =async function(nombreGateway){
+exports.buscarURLGateway = async function(nombreGateway){
     let esquemaAuxiliar = mongoose.model('URLGateway');
-    let consulta= await esquemaAuxiliar.findOne({ 'nombre': nombreGateway}).exec();
-    let URL=consulta.URL;
+    let consulta = await esquemaAuxiliar.findOne({ 'nombre': nombreGateway}).exec();
+    let URL = consulta.URL;
     return URL;
 }
-exports.buscarNombreGateway= async function(idCompra){
-    let esquemaAuxiliar = mongoose.model('Compra');
-    let consulta= await esquemaAuxiliar.findOne({ '_id': idCompra}).exec();
+exports.buscarNombreGateway = async function(idTransaccion){
+    let esquemaAuxiliar = mongoose.model('Transaccion');
+    let consulta = await esquemaAuxiliar.findOne({ '_id': idTransaccion}).exec();
     return consulta.gateway;
 }
-exports.consultarIDCompraEmisor =async function(idCompra){
-    let esquemaAuxiliar = mongoose.model('Compra');
-    let consulta= await esquemaAuxiliar.findOne({ '_id': idCompra}).exec();
-    return consulta.idCompraEmisor;
+exports.consultarIDTransaccionEmisor = async function(idTransaccion){
+    let esquemaAuxiliar = mongoose.model('Transaccion');
+    let consulta = await esquemaAuxiliar.findOne({ '_id': idTransaccion}).exec();
+    return consulta.idTransaccionEmisor;
 } 
-exports.consultarIDCompraRed =async function(idCompra){
-    let esquemaAuxiliar = mongoose.model('Compra');
-    let consulta= await esquemaAuxiliar.findOne({ '_id': idCompra}).exec();
-    return consulta.idCompraRed;
+exports.consultarIDTransaccionRed = async function(idTransaccion){
+    let esquemaAuxiliar = mongoose.model('Transaccion');
+    let consulta = await esquemaAuxiliar.findOne({ '_id': idTransaccion}).exec();
+    return consulta.idTransaccionRed;
 } 
-exports.consultarIDCompraGateway =async function(idCompra){
-    let esquemaAuxiliar = mongoose.model('Compra');
-    let consulta= await esquemaAuxiliar.findOne({ '_id': idCompra}).exec();
-    return consulta.idCompraGate;
+exports.consultarIDTransaccionGateway = async function(idTransaccion){
+    let esquemaAuxiliar = mongoose.model('Transaccion');
+    let consulta = await esquemaAuxiliar.findOne({ '_id': idTransaccion}).exec();
+    return consulta.idTransaccionGate;
 } 
 
 

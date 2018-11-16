@@ -1,22 +1,26 @@
 var persistencia= require("../Persistencia/mongoDBConeccion");
 var configApp=require('../Config/app');
  
-exports.guardarCompra = async (req) => {
+exports.guardarTransaccion = async (req) => {
      if(await controlFraude(req)){
-    var idCompra=await persistencia.guardarCompra(req);
-    return idCompra;
+    var idTransaccion=await persistencia.guardarTransaccion(req);
+    return idTransaccion;
     }else{
-        throw new Error('limite compras excedida');
+        throw new Error('limite Transacciones excedida');
     }
 }; 
-exports.eliminarCompra = async (req) => {
-    var idCompra=await persistencia.eliminarCompra(req);
-    return idCompra;
+exports.realizarDevolucionTransaccion = async (req) => {
+   var idTransaccion = await persistencia.realizarDevolucionTransaccion(req);
+   return idTransaccion;
+}; 
+exports.revertirTransaccion = async (req) => {
+    var idTransaccion=await persistencia.eliminarTransaccion(req);
+    return idTransaccion;
 }; 
 controlFraude = async (req) => { 
-    var cantCompras=await persistencia.controlFraude(req.body.tarjeta);
+    var cantTransacciones=await persistencia.controlFraude(req.body.tarjeta);
     //desmarcar esta linea para la entrega
-    //return cantCompras<configApp.cantidadTrxs;
+    //return cantTransacciones<configApp.CANTIDADTRX;
     return true;
 }; 
 

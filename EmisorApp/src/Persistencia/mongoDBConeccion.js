@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-var compra= require('../Modelo/compraEsquema');
-var tarjeta= require('../Modelo/TarjetaEsquema');
+var transaccion= require('../Modelo/transaccionEsquema');
+var tarjeta= require('../Modelo/tarjetaEsquema');
 var chargeBack= require('../Modelo/chargeBack');
 var configDB = require('../Config/db');
 var configapp = require('../Config/app');
@@ -17,36 +17,43 @@ exports.Conectar = async function() {
     console.log('Error al conectar a la base');
   }
 }
-exports.guardarCompra = async function(req){
-    let esquemaCompra = new compra(req.body);
-    await esquemaCompra.save();
-    console.log('IDCompra:'+ esquemaCompra._id);
-    return esquemaCompra._id;
+exports.guardarTransaccion = async function(req){
+    let esquemaTransaccion = new transaccion(req.body);
+    await esquemaTransaccion.save();
+    console.log('IDTransaccion:'+ esquemaTransaccion._id);
+    return esquemaTransaccion._id;
 }
-exports.eliminarCompra = async function(req){
-     let eliminado=await compra.findByIdAndDelete({ _id:req.params.id});
+exports.eliminarTransaccion = async function(req){
+     let eliminado=await transaccion.findByIdAndDelete({ _id:req.params.id});
      if(!eliminado){
          throw new Error('No se encontró el id');
      }
-     console.log('IDCompra eliminado:'+ req.params.id);
+     console.log('IDTransaccion eliminado:'+ req.params.id);
      return req.params.id;
+}
+exports.realizarDevolucionTransaccion = async function(req){
+    let esquemaAuxiliar = await transaccion.findById(req.body.idTransaccion);
+    esquemaAuxiliar.devolucion = true;
+    await esquemaAuxiliar.save();
+    console.log('IDTransaccion devolución:'+ esquemaAuxiliar._id);
+    return esquemaAuxiliar._id;
 }
  exports.altaTarjeta = async function(altatarjeta){
     let esquemaTarjeta= new tarjeta(altatarjeta);
     await esquemaTarjeta.save();
     console.log('número tarjeta: '+ esquemaTarjeta.numero);   
 }
-exports.consultarTotalComprasEnTarjeta = async function(req){
+exports.consultarTotalTransaccionesEnTarjeta = async function(req){
     let hasta = new Date();
     let desde = new Date();
     desde.setDate(1);
     desde.setHours(0,0,0,0);
-    var esquemaCompra = mongoose.model('Compra');
+    var esquemaTransaccion = mongoose.model('Transaccion');
     try{
-        let resultado = await esquemaCompra.aggregate([
+        let resultado = await esquemaTransaccion.aggregate([
             {$match:{
                 tarjeta:req.body.tarjeta,
-                fechaCompra:{$gte:desde,
+                fechaTransaccion:{$gte:desde,
                     $lte:hasta
                 },
             }
@@ -86,10 +93,10 @@ exports.guardarChargeBack = async function(req){
     console.log('IDchargeBack:'+ esquemaChargeBack._id);
     return esquemaChargeBack._id;
 }
-exports.consultarFechaCompra = async function(idCompra){
-    let compraAuxiliar = mongoose.model('Compra');
-    let consulta= await compraAuxiliar.findOne({ '_id': idCompra}).exec();
-    return consulta.fechaCompra;
+exports.consultarFechaTransaccion = async function(idTransaccion){
+    let transaccionAuxiliar = mongoose.model('Transaccion');
+    let consulta= await transaccionAuxiliar.findOne({ '_id': idTransaccion}).exec();
+    return consulta.fechaTransaccion;
 } 
 
 /* 
