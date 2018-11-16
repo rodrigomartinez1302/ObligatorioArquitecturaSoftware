@@ -30,9 +30,23 @@ exports.guardarTransaccion =async function(req){
     console.log('IDTransaccion eliminado:'+ idTransaccionAEliminar);
     return idTransaccionAEliminar;
 }
-exports.realizarDevolucionTransaccion = async function(req){
-    let esquemaAuxiliar = await transaccion.findById(req.body.idTransaccion);
+exports.realizarDevolucionTransaccion = async function(idTransaccion){
+    let esquemaAuxiliar = await transaccion.findById(idTransaccion);
     esquemaAuxiliar.devolucion = true;
+    await esquemaAuxiliar.save();
+    console.log('IDTransaccion devolución:'+ esquemaAuxiliar._id);
+    return esquemaAuxiliar._id;
+}
+exports.realizarChargeBack = async function(idTransaccion){
+    let esquemaAuxiliar = await transaccion.findById(idTransaccion);
+    esquemaAuxiliar.chargeBack = true;
+    await esquemaAuxiliar.save();
+    console.log('IDTransaccion chargeback:'+ esquemaAuxiliar._id);
+    return esquemaAuxiliar._id;
+}
+exports.revertirDevolucionTransaccion = async function(req){
+    let esquemaAuxiliar = await transaccion.findById(req.body.idTransaccion);
+    esquemaAuxiliar.devolucion = false;
     await esquemaAuxiliar.save();
     console.log('IDTransaccion devolución:'+ esquemaAuxiliar._id);
     return esquemaAuxiliar._id;
@@ -59,24 +73,30 @@ exports.buscarNombreGateway = async function(idTransaccion){
     let consulta = await esquemaAuxiliar.findOne({ '_id': idTransaccion}).exec();
     return consulta.gateway;
 }
-exports.consultarIDTransaccionEmisor = async function(idTransaccion){
+exports.consultarIDTransaccionGateway = async function(idTransaccion){
     let esquemaAuxiliar = mongoose.model('Transaccion');
-    let consulta = await esquemaAuxiliar.findOne({ '_id': idTransaccion}).exec();
-    return consulta.idTransaccionEmisor;
+    let consulta = await esquemaAuxiliar.findById(idTransaccion).exec();
+    if(!consulta){
+        throw new Error('No existe la transacción')
+    }
+    return consulta.idTransaccionGate;
 } 
 exports.consultarIDTransaccionRed = async function(idTransaccion){
     let esquemaAuxiliar = mongoose.model('Transaccion');
-    let consulta = await esquemaAuxiliar.findOne({ '_id': idTransaccion}).exec();
+    let consulta = await esquemaAuxiliar.findById(idTransaccion).exec();
     if(!consulta){
         throw new Error('No existe la transacción')
     }
     return consulta.idTransaccionRed;
-} 
-exports.consultarIDTransaccionGateway = async function(idTransaccion){
+}
+exports.consultarIDTransaccionEmisor = async function(idTransaccion){
     let esquemaAuxiliar = mongoose.model('Transaccion');
-    let consulta = await esquemaAuxiliar.findOne({ '_id': idTransaccion}).exec();
-    return consulta.idTransaccionGate;
-} 
+    let consulta = await esquemaAuxiliar.findById(idTransaccion).exec();
+    if(!consulta){
+        throw new Error('No existe la transacción')
+    }
+    return consulta.idTransaccionEmisor;
+}   
 
 
 

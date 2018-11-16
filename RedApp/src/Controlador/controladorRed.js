@@ -17,6 +17,10 @@ exports.revertirTransaccion = async (req) => {
     var idTransaccion=await persistencia.eliminarTransaccion(req);
     return idTransaccion;
 }; 
+exports.realizarChargeBack = async (req) => {
+    var idTransaccion = await persistencia.realizarChargeBack(req);
+    return idTransaccion;
+ }; 
 controlFraude = async (req) => { 
     var cantTransacciones=await persistencia.controlFraude(req.body.tarjeta);
     //desmarcar esta linea para la entrega

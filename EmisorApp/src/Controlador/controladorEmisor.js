@@ -2,6 +2,7 @@ var persistencia= require("../Persistencia/mongoDBConeccion");
 var luhn = require('luhn-alg');
 var DateDiff = require('date-diff');
 var configApp=require('../Config/app');
+var peticiones= require("../Servicios/controladorPeticiones");
 
 exports.guardarTransaccion = async (req) => {
     await controlarValidezTarjeta(req);
@@ -13,13 +14,29 @@ exports.guardarTransaccion = async (req) => {
     return idTransaccion;
 }; 
 exports.revertirTransaccion = async (req) => {
-    //controlarCantidadDiasTransaccion(req);
     let idTransaccion=await persistencia.eliminarTransaccion(req);
     return idTransaccion;
 }; 
 exports.realizarDevolucionTransaccion = async (req) => {
-    var idTransaccion = await persistencia.realizarDevolucionTransaccion(req);
+    //controlarCantidadDiasTransaccion(req);
+    let idTransaccion = await persistencia.realizarDevolucionTransaccion(req);
     return idTransaccion;
+ }; 
+ exports.realizarChargeBack = async (req) => {
+    let idTransaccion;
+     try {
+         let respuesta = await peticiones.enviarChargeBackTePagoYa(req);
+         idTransaccion = respuesta;
+         console.log(respuesta.data);
+     } catch (error) {
+         throw new Error(error.message);
+     }
+     try {
+        await persistencia.realizarChargeBack(idTransaccion);
+     } catch(error) {
+         throw new Error(error.message);
+     }
+     return req.body.idTransaccion;
  }; 
 controlarCantidadDiasTransaccion = async (req) => {
     let fechaTransaccion = new Date(await persistencia.consultarFechaTransaccion(req.params.id));

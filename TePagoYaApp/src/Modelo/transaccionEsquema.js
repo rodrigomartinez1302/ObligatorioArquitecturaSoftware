@@ -32,7 +32,9 @@ var transaccionEsquema = new mongoose.Schema({
     gateway : {type: String, required: true} ,
     idTransaccionGate : {type: String, required: true},
     idTransaccionRed : {type: String, required: true},
-    idTransaccionEmisor : {type: String, required: true}
+    idTransaccionEmisor : {type: String, required: true},
+    devolucion : {type: Boolean, default: false},
+    chargeBack : {type: Boolean, default: false}
 });
 module.exports = mongoose.model('Transaccion', transaccionEsquema);
  

@@ -1,11 +1,11 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-var transaccion= require('../Modelo/TransaccionEsquema');
+var transaccion = require('../Modelo/TransaccionEsquema');
 var db = require('../Config/db');
 
 mongoose.Promise = global.Promise;
 
-exports.Conectar= async function() { 
+exports.Conectar = async function() { 
   try {
     await mongoose.connect(db.URL,
       { useNewUrlParser: true },)
@@ -20,13 +20,27 @@ exports.guardarTransaccion = async function(req){
     console.log('IDTransaccion:'+ esquemaAuxiliar._id);
     return esquemaAuxiliar._id;
 }
-exports.eliminarTransaccion =async function(req){
-     let eliminado=await transaccion.findByIdAndDelete({ _id:req.params.id});
+exports.eliminarTransaccion = async function(req){
+     let eliminado = await transaccion.findByIdAndDelete({ _id:req.params.id});
      if(!eliminado){
          throw new Error('No se encontró el id');
      }
      console.log('IDTransaccion eliminado:'+ req.params.id);
      return req.params.id;
+}
+exports.realizarDevolucionTransaccion = async function(req){
+    let esquemaAuxiliar = await transaccion.findById(req.body.idTransaccion);
+    esquemaAuxiliar.devolucion = true;
+    await esquemaAuxiliar.save();
+    console.log('IDTransaccion devolución:'+ esquemaAuxiliar._id);
+    return esquemaAuxiliar._id;
+}
+exports.realizarChargeBack = async function(req){
+    let esquemaAuxiliar = await transaccion.findById(req.body.idTransaccion);
+    esquemaAuxiliar.chargeBack = true;
+    await esquemaAuxiliar.save();
+    console.log('IDTransaccion chargeback:'+ esquemaAuxiliar._id);
+    return esquemaAuxiliar._id;
 }
  exports.cerrarLotes = function(fechaCierre,RUT){
     var esquemaAuxiliar = mongoose.model('Transaccion');
@@ -42,7 +56,7 @@ exports.eliminarTransaccion =async function(req){
                 "$eq":RUT
             }
         }
-    ).exec().then((resultado)=>{
+    ).exec().then((resultado) => {
         console.log(resultado);
       
     })

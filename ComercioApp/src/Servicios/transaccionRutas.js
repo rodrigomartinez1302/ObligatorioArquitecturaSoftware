@@ -20,13 +20,14 @@ app.put('/Transacciones/Devoluciones', async (req , res) => {
     res.status(500).send(error.message);
 }
 });
-app.post('/ChargeBacks', async (req, res) => {
+app.post('/Transacciones/ChargeBacks', async (req, res) => {
   try {
-    var respuesta = await controladorComercio.enviarChargeTePagoYa(req);
+    console.log(req.body);
+    var respuesta = await controladorComercio.procesarChargeBack(req);
     res.status(200).send(respuesta);
   } catch(error) {
     console.log(error.message);
     res.status(500).send(error.message);
-}
+  }
 });
 }

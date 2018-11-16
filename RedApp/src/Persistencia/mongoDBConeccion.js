@@ -24,8 +24,21 @@ exports.guardarTransaccion = async function(req){
 }
 exports.realizarDevolucionTransaccion = async function(req){
     let esquemaAuxiliar = await transaccion.findById({ _id:req.body.idTransaccion});
-    console.log(esquemaAuxiliar);
     esquemaAuxiliar.devolucion = true;
+    await esquemaAuxiliar.save();
+    console.log('IDTransaccion devolución:'+ esquemaAuxiliar._id);
+    return esquemaAuxiliar._id;
+}
+exports.realizarChargeBack = async function(req){
+    let esquemaAuxiliar = await transaccion.findById(req.body.idTransaccion);
+    esquemaAuxiliar.chargeBack = true;
+    await esquemaAuxiliar.save();
+    console.log('IDTransaccion chargeback:'+ esquemaAuxiliar._id);
+    return esquemaAuxiliar._id;
+}
+exports.revertirDevolucionTransaccion = async function(req){
+    let esquemaAuxiliar = await transaccion.findById({ _id:req.body.idTransaccion});
+    esquemaAuxiliar.devolucion = false;
     await esquemaAuxiliar.save();
     console.log('IDTransaccion devolución:'+ esquemaAuxiliar._id);
     return esquemaAuxiliar._id;

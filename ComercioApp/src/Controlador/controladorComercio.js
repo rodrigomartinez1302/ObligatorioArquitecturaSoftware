@@ -17,7 +17,6 @@ exports.realizarDevolucionTransaccion = async (req) => {
     var respuesta = await peticiones.enviarDevolucionTePagoYa(req);
     return respuesta;
 }; 
-exports.enviarChargeTePagoYa = async (req) => {
-    var respuesta = await peticiones.enviarChargeBackTePagoYa(req);
-    return respuesta;
+exports.procesarChargeBack = async (req) => {
+    console.log('ChargeBack solicitado IDTransaccion:'+ req.body.idTransaccion);
 }; 
