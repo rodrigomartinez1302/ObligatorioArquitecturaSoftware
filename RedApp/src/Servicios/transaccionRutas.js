@@ -1,5 +1,3 @@
-
-var peticiones= require("./controladorPeticiones");
 var controladorRed= require("../Controlador/controladorRed");
 
 module.exports = function (app, db) {

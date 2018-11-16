@@ -1,5 +1,3 @@
-const persistencia= require("../Persistencia/controladorDB");
-const peticiones= require("./controladorPeticiones");
 var controladorComercio= require("../Controlador/controladorComercio");
 
 module.exports = function(app,db) {
@@ -22,7 +20,6 @@ app.put('/Transacciones/Devoluciones', async (req , res) => {
 });
 app.post('/Transacciones/ChargeBacks', async (req, res) => {
   try {
-    console.log(req.body);
     var respuesta = await controladorComercio.procesarChargeBack(req);
     res.status(200).send(respuesta);
   } catch(error) {

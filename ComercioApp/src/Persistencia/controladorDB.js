@@ -1,5 +1,4 @@
 var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
 var transaccion= require('../Modelo/TransaccionEsquema.js');
 var gateway= require('../Modelo/categoriaTransaccionGatewayEsquema.js');
 var db = require('../Config/db');

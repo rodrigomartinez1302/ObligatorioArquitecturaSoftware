@@ -1,6 +1,5 @@
 var express = require('express');
 var bodyParser = require('body-parser');
-var mongoose = require('mongoose');
 var persistencia = require('./src/Persistencia/controladorDB');
 var servicios = require('./src/Servicios/transaccionRutas');
 var config = require('./src/Config/app');
