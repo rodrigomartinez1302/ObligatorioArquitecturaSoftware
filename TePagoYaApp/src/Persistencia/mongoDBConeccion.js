@@ -30,6 +30,13 @@ exports.guardarTransaccion =async function(req){
     console.log('IDTransaccion eliminado:'+ idTransaccionAEliminar);
     return idTransaccionAEliminar;
 }
+exports.realizarDevolucionTransaccion = async function(req){
+    let esquemaAuxiliar = await transaccion.findById(req.body.idTransaccion);
+    esquemaAuxiliar.devolucion = true;
+    await esquemaAuxiliar.save();
+    console.log('IDTransaccion devolución:'+ esquemaAuxiliar._id);
+    return esquemaAuxiliar._id;
+}
 exports.guardarGateway = async function(gatewayAGuardar){
     var esquemaAuxiliar = new gateway(gatewayAGuardar);
     await esquemaAuxiliar.save(function(error,respuesta){
@@ -60,6 +67,9 @@ exports.consultarIDTransaccionEmisor = async function(idTransaccion){
 exports.consultarIDTransaccionRed = async function(idTransaccion){
     let esquemaAuxiliar = mongoose.model('Transaccion');
     let consulta = await esquemaAuxiliar.findOne({ '_id': idTransaccion}).exec();
+    if(!consulta){
+        throw new Error('No existe la transacción')
+    }
     return consulta.idTransaccionRed;
 } 
 exports.consultarIDTransaccionGateway = async function(idTransaccion){

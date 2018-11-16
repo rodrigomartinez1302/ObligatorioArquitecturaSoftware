@@ -23,7 +23,8 @@ exports.guardarTransaccion = async function(req){
     return esquemaAuxiliar._id;
 }
 exports.realizarDevolucionTransaccion = async function(req){
-    let esquemaAuxiliar = await transaccion.findById(req.body.idTransaccion);
+    let esquemaAuxiliar = await transaccion.findById({ _id:req.body.idTransaccion});
+    console.log(esquemaAuxiliar);
     esquemaAuxiliar.devolucion = true;
     await esquemaAuxiliar.save();
     console.log('IDTransaccion devolución:'+ esquemaAuxiliar._id);

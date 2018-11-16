@@ -23,6 +23,12 @@ exports.revertirTransaccionRed = async (idTransaccionAEliminar) => {
     let respuesta = await axios.delete(configRed.URLTRANSACCION+'/'+idTransaccionAEliminar);
     return respuesta.data;
 };
+exports.enviarDevolucionTransaccionRed = async (idTransaccionDevolucion) => {
+    let devolucionTransaccionEnviar = {idTransaccion:idTransaccionDevolucion};  
+    console.log(devolucionTransaccionEnviar);
+    let respuesta = await axios.put(configRed.URLDEVOLUCIONES,devolucionTransaccionEnviar);
+    return respuesta.data;
+};
 exports.enviarTransaccionEmisor = async (req) => { 
     let transaccionEnviar = {monto:req.body.monto,fechaTransaccion:req.body.fechaTransaccion
         ,tarjeta:req.body.tarjeta.numero};

@@ -21,8 +21,9 @@ module.exports = function (app, db) {
       res.status(500).send(error.message);
     }
   });
-  app.post('/Transacciones/Devoluciones',async(req,res)=>{
+  app.put('/Transacciones/Devoluciones',async(req,res)=>{
     try{
+      console.log(req.body);
       var respuesta= await controladorRed.realizarDevolucionTransaccion(req);
       res.status(200).send(respuesta);
     }catch(error){

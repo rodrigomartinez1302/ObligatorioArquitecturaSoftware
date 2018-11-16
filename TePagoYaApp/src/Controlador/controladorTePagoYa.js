@@ -83,10 +83,19 @@ guardarTransaccion = async (req) => {
     let idTransaccion = await persistencia.guardarTransaccion(req);
     return idTransaccion;
 }; 
-revertirTransaccion = async (idComraAEliminarTePagoYa) => {
-    let idTransaccion = await persistencia.eliminarTransaccion(idComraAEliminarTePagoYa);
+revertirTransaccion = async (idTransaccionEliminarTePagoYa) => {
+    let idTransaccion = await persistencia.eliminarTransaccion(idTransaccionEliminarTePagoYa);
     return idTransaccion;
 }; 
+exports.realizarDevolucionTransaccion = async (req) => {
+    await consultarIDTransaccionRed(req.body.idTransaccion);
+    var idTransaccionRed = await peticiones.enviarDevolucionTransaccionRed(idTransaccionRed);
+    //Corregir el id que retorna, no es este el que hay que retornar, es el de tepagoya
+    return idTransaccionRed;
+ }; 
+ consultarIDTransaccionRed= async (idTransaccion) => {
+    idTransaccionRed = await persistencia.consultarIDTransaccionRed(idTransaccion);
+};
 /*
 exports.comunicacionRevertirTransaccion = async (req) => {
     idTransaccionTePagoYa = req.params.id;
@@ -112,7 +121,7 @@ exports.comunicacionRevertirTransaccion = async (req) => {
     }
     return idTransaccionTePagoYa;
 };  
-*/
+
 comunicacionRevertirTransaccionEmisor= async (req) => {
     await consultarIDTransaccionEmisor(idTransaccionTePagoYa);
     let respuesta= await revertirTransaccionEmisor(idTransaccionEmisor);
@@ -156,4 +165,4 @@ comunicacionChargeBackEmisor= async (req) => {
     let respuesta = await peticiones.enviarChargeBackEmisor(idTransaccionEmisor);
     return respuesta;
 };
-
+*/

@@ -1,3 +1,4 @@
 module.exports = {
-    URLTRANSACCION : 'http://localhost:11000/Transacciones'
+    URLTRANSACCION : 'http://localhost:11000/Transacciones',
+    URLDEVOLUCIONES : 'http://localhost:11000/Transacciones/Devoluciones'
 }

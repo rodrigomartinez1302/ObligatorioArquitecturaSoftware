@@ -10,7 +10,7 @@ exports.enviarTransaccionTePagoYa = async (req) => {
 };
 exports.enviarDevolucionTePagoYa = async (req) => {  
     let devolucionEnviar=req.body;
-    let respuesta =await axios.put(configTePagoYa.URLTRANSACCION,devolucionEnviar);
+    let respuesta =await axios.put(configTePagoYa.URLDEVOLUCION,devolucionEnviar);
     return respuesta.data;
 };
 exports.enviarChargeBackTePagoYa = async (req) => {  

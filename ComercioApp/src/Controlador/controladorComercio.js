@@ -1,7 +1,7 @@
 var peticiones= require("../Servicios/controladorPeticiones");
 var persistencia= require("../Persistencia/controladorDB");
 
-exports.enviarTransaccionTePagoYa = async (req) => {
+exports.enviarTransaccion = async (req) => {
     let transaccionAEnviar = await seleccionarGateway(req);
     req.body = transaccionAEnviar;
     var respuesta= await peticiones.enviarTransaccionTePagoYa(req);
@@ -13,7 +13,7 @@ seleccionarGateway = async (req) => {
     transaccionEnviar.gateway= gateway;
     return transaccionEnviar;
 };  
-exports.enviarDevolucionTePagoYa = async (req) => {
+exports.realizarDevolucionTransaccion = async (req) => {
     var respuesta = await peticiones.enviarDevolucionTePagoYa(req);
     return respuesta;
 }; 
