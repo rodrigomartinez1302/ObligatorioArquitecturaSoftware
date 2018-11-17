@@ -5,7 +5,10 @@ var idTransaccionRed;
 var idTransaccionEmisor;
 var idTransaccionTePagoYa;
 
+
+
 exports.comunicacionTransaccion= async (req) => {
+    console.log(req.headers['token']);
     try {
         let respuesta= await comunicacionTransaccionGateway(req);
         idTransaccionGateway = respuesta;
@@ -188,7 +191,7 @@ comunicacionChargeBackRed= async (req) => {
     await peticiones.enviarChargeBackRed(idTransaccionRed);
 };
 comunicacionChargeBackComercio= async (req) => {
-    await peticiones.comunicacionChargeBackComercio(idTransaccionRed);
+    await peticiones.comunicacionChargeBackComercio(idTransaccionTePagoYa);
 };
 
 /*

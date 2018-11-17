@@ -7,7 +7,7 @@ mongoose.Promise = global.Promise;
 
 exports.Conectar =async   function (){ 
     try {
-        await mongoose.connect(db.url,
+        await mongoose.connect(db.URL,
             { useNewUrlParser: true },)
             console.log('Connección a la base exitosa');
         }

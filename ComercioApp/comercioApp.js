@@ -3,6 +3,7 @@ var bodyParser = require('body-parser');
 var persistencia = require('./src/Persistencia/controladorDB');
 var servicios = require('./src/Servicios/transaccionRutas');
 var config = require('./src/Config/app');
+var controladorComercio = require("./src/Controlador/controladorComercio");
 
 //Ver como dar de alta los gateway
 //const auxGateway={categoriaTransaccion:'Electrodomésticos',nombreGateway:'gateway2'}
@@ -19,11 +20,15 @@ try{
     console.log("Error al conectar"); 
 }
 app.listen(config.PUERTO, function() { 
-    console.log('App corriendo'); }).on('error', function(err) { 
+    console.log('App corriendo');
+})
+.on('error', function(err) { 
         if (err) {
              console.log('Error al levantar la app'); 
             } 
         });
+
+controladorComercio.loginAutenticacion();
 
 
 

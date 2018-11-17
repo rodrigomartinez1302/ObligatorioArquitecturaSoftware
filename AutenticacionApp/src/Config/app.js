@@ -1,3 +1,4 @@
 module.exports = {
-    CLAVE : 'Clave'
+    CLAVE : 'Clave',
+    PUERTO : '13000',
 }
