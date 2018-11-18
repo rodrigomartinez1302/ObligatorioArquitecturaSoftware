@@ -7,6 +7,7 @@ exports.enviarTransaccionTePagoYa = async (req) => {
     let transaccionEnviar = req.body;
     transaccionEnviar.RUT = configApp.RUT;
     let header = {headers: {token: configAutenticacion.TOKEN}}; 
+    console.log(header.headers);
     var respuesta = await axios.post(configTePagoYa.URLTRANSACCION, transaccionEnviar, header);
     return respuesta.data;
 };

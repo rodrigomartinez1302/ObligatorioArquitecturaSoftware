@@ -1,19 +1,31 @@
 var peticiones= require("../Servicios/controladorPeticiones");
 var persistencia= require("../Persistencia/controladorDB");
 var configAutenticacion= require("../Config/autenticacion");
+var cache = require("../Persistencia/controladorCache");
 
 exports.enviarTransaccion = async (req) => {
-    let transaccionAEnviarConGateway = await seleccionarGateway(req);
-    req.body = transaccionAEnviarConGateway;
+    let categoria = req.body.producto.categoria;
+    let nombreGateway = await cache.cache(categoria);
+    if(!nombreGateway) {
+        nombreGateway = await seleccionarGateway(categoria);
+        cache.guardarEnCache(categoria, nombreGateway);
+    }
+    req.body.gateway = nombreGateway;
     let respuesta= await peticiones.enviarTransaccionTePagoYa(req);
     return respuesta;
 };   
+seleccionarGateway = async (categoria) => {
+    let gateway = await persistencia.buscarGatewayPorCategoria(categoria);
+    return gateway;
+};  
+/*
 seleccionarGateway = async (req) => {
     let transaccionEnviar = req.body;
     let gateway = await persistencia.buscarGatewayPorCategoria(req.body.producto.categoria)
     transaccionEnviar.gateway= gateway;
     return transaccionEnviar;
 };  
+*/
 exports.realizarDevolucionTransaccion = async (req) => {
     let respuesta = await peticiones.enviarDevolucionTePagoYa(req);
     return respuesta;

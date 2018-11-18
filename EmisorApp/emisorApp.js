@@ -3,7 +3,7 @@ var bodyParser = require('body-parser');
 var persistencia = require('./src/Persistencia/mongoDBConeccion');
 var servicios = require('./src/Servicios/transaccionRutas');
 var config = require('./src/Config/app');
-var controladorPrueba = require('./src/Controlador/controladorEmisor');
+var controladorEmisor = require('./src/Controlador/controladorEmisor');
 
 
 // Express Configuration
@@ -23,5 +23,6 @@ app.listen(config.PUERTO, function() {
             console.log('Error al levantar la app'); 
         } 
     });
+controladorEmisor.loginAutenticacion();
 
 

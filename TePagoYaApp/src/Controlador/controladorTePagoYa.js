@@ -1,17 +1,15 @@
 var peticiones= require("../Servicios/controladorPeticiones");
-var persistencia= require("../Persistencia/mongoDBConeccion");
+var persistencia= require("../Persistencia/controladorDB");
+var configAutenticacion= require("../Config/autenticacion");
 var idTransaccionGateway;
 var idTransaccionRed;
 var idTransaccionEmisor;
-var idTransaccionTePagoYa;
-
-
 
 exports.comunicacionTransaccion= async (req) => {
-    console.log(req.headers['token']);
+    await validacionAutenticacion(req);
     try {
-        let respuesta= await comunicacionTransaccionGateway(req);
-        idTransaccionGateway = respuesta;
+        let respuesta = await comunicacionTransaccionGateway(req);
+        idTransaccionGateway = respuesta.idTransaccion;
     } catch (error) {
         throw new Error(error.respuesta);
     }
@@ -193,6 +191,26 @@ comunicacionChargeBackRed= async (req) => {
 comunicacionChargeBackComercio= async (req) => {
     await peticiones.comunicacionChargeBackComercio(idTransaccionTePagoYa);
 };
+exports.loginAutenticacion = async () => {
+    try {
+        let respuesta = await peticiones.loginAutenticacion();
+        configAutenticacion.TOKEN = respuesta.data.token;
+        if(!respuesta.data.auth) {
+            throw new Error('Usuario no autenticado')
+        } else {
+            console.log('Autenticación exitosa');
+        }
+    }
+    catch(error) {
+        console.log(error.message);
+    } 
+};
+validacionAutenticacion = async (req) => {
+    let respuesta = await peticiones.validacionAutenticacion(req);
+    if (!respuesta.auth) {
+        throw new Error(respuesta.message);
+    }
+}
 
 /*
 

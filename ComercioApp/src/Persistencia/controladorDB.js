@@ -5,7 +5,7 @@ var db = require('../Config/db');
 
 mongoose.Promise = global.Promise;
 
-exports.Conectar =async   function (){ 
+exports.Conectar = async   function (){ 
     try {
         await mongoose.connect(db.URL,
             { useNewUrlParser: true },)
@@ -43,9 +43,9 @@ exports.guardarGateway = async function(gatewayAGuardar){
         }
     });
 }
-exports.buscarGatewayPorCategoria= async function(categoria){
+exports.buscarGatewayPorCategoria = async function(categoria){
     let gatewayAuxiliar= await mongoose.model('CategoriaTransaccionGatewayEsquema');
     let gateRetorno;
-    gateRetorno= await gatewayAuxiliar.findOne({ 'categoriaTransaccion': categoria}, 'nombreGateway').exec();
+    gateRetorno = await gatewayAuxiliar.findOne({ 'categoriaTransaccion': categoria}, 'nombreGateway').exec();
     return gateRetorno.nombreGateway;
 }

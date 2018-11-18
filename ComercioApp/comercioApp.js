@@ -27,7 +27,6 @@ app.listen(config.PUERTO, function() {
              console.log('Error al levantar la app'); 
             } 
         });
-
 controladorComercio.loginAutenticacion();
 
 

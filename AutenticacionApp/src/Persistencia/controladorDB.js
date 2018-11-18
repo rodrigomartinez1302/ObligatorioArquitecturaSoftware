@@ -18,6 +18,7 @@ exports.registrarUsuario = async function(datosUsuario){
     datosUsuario.contraseña = bcrypt.hashSync(datosUsuario.contraseña);
     var esquemaAuxiliar = new usuario(datosUsuario);
     await esquemaAuxiliar.save();
+    console.log('ID usuario registrado: '+ esquemaAuxiliar._id)
     return esquemaAuxiliar._id;
   }   
 exports.controlLogin = async function(req){

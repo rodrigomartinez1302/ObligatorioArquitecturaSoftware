@@ -3,7 +3,8 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var persistencia = require('./src/Persistencia/mongoDBConeccion');
 var servicios = require('./src/Servicios/transaccionRutas');
-const config = require('./src/Config/app');
+var config = require('./src/Config/app');
+var controladorRed = require("./src/Controlador/controladorRed");
 
 
 // Express Configuration
@@ -23,6 +24,6 @@ app.listen(config.PUERTO, function() {
         if (err) {
              console.log('Error al levantar la app'); 
             } 
-        });
-
+        });     
+controladorRed.loginAutenticacion();
 

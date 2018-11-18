@@ -21,7 +21,8 @@ app.listen(config.PUERTO, function() {
         } 
     });
 
-//let auxUsuario = {nombre: '1111', contraseña: '1111'}
+
+//let auxUsuario = {nombre: '5555', contraseña: '5555'}
 //persistencia.registrarUsuario(auxUsuario);
 
 

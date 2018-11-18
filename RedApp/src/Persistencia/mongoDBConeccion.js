@@ -60,14 +60,14 @@ exports.controlFraude = async function(nroTarjeta){
     //console.log(desde);
     //console.log(hasta);
     //console.log(nroTarjeta);
-    resultado= await esquemaAuxiliar.find(
+    resultado = await esquemaAuxiliar.find(
       {
           "fechaTransaccion":{
                 "$gte": desde,
                 "$lte": hasta
             },
             "tarjeta": {
-                "$eq":nroTarjeta
+                "$eq": nroTarjeta
             }
         }
     ).exec();

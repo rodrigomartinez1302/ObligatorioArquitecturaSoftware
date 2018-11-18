@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var transaccion = require('../Modelo/TransaccionEsquema');
+var red = require('../Modelo/redEsquema');
 var db = require('../Config/db');
 
 mongoose.Promise = global.Promise;
@@ -61,6 +62,22 @@ exports.realizarChargeBack = async function(req){
       
     })
  } 
+ exports.guardarRed = async function(redAGuardar){
+    var esquemaAuxiliar = new red(redAGuardar);
+    await esquemaAuxiliar.save(function(error,respuesta){
+        if (error) {
+            throw new Error(error.message);
+        }
+    });
+}
+exports.buscarRedPorPrefijoTarjeta = async function(idRed) {
+    let redAuxiliar = await mongoose.model('Emisor');
+    let emisorRetorno = await redAuxiliar.findOne({ 'idRed': idRed}, 'nombreRed').exec();
+    if(!emisorRetorno) {
+        throw new Error ('Error en busqueda de Red');
+    }
+    return emisorRetorno.nombreRed;
+}
 
 
 

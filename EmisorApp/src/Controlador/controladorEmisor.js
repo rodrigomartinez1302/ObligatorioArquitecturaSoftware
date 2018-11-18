@@ -3,8 +3,10 @@ var luhn = require('luhn-alg');
 var DateDiff = require('date-diff');
 var configApp=require('../Config/app');
 var peticiones= require("../Servicios/controladorPeticiones");
+var configAutenticacion= require("../Config/autenticacion");
 
 exports.guardarTransaccion = async (req) => {
+    await validacionAutenticacion(req);
     await controlarValidezTarjeta(req);
     await controlarSaldoTarjeta(req);
     await controlarBloqueoTarjeta(req);
@@ -87,13 +89,27 @@ exports.guardarChargeBack = async (req) => {
     var idTransaccion = await persistencia.guardarChargeBack(req);
     return idTransaccion;
 }; 
-
-
-/*
-actualizarSaldoTarjeta=async (req) => {
-    let saldo= await persistencia.actualizarSaldoTarjeta(req);
+exports.loginAutenticacion = async () => {
+    try {
+        let respuesta = await peticiones.loginAutenticacion();
+        configAutenticacion.TOKEN = respuesta.data.token;
+        if(!respuesta.data.auth) {
+            throw new Error('Usuario no autenticado')
+        } else {
+            console.log('Autenticación exitosa');
+        }
+    }
+    catch(error) {
+        console.log(error.message);
+    } 
+};
+validacionAutenticacion = async (req) => {
+    let respuesta = await peticiones.validacionAutenticacion(req);
+    if (!respuesta.auth) {
+        throw new Error(respuesta.message);
+    }
 }
-*/
+
    
     
 

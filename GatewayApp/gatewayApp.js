@@ -3,6 +3,7 @@ var bodyParser = require('body-parser');
 var persistencia = require('./src/Persistencia/mongoDBConeccion');
 var servicios = require('./src/Servicios/transaccionRutas');
 var config = require('./src/Config/app');
+var controladorGateway = require("./src/Controlador/controladorGateway");
 
 
 // Express Configuration
@@ -22,3 +23,7 @@ app.listen(config.PUERTO, function() {
             console.log('Error al levantar la app'); 
         } 
     });
+controladorGateway.loginAutenticacion();
+
+//let auxRed = {idRed: '5', nombreRed: 'Red2'}
+//persistencia.guardarRed(auxRed);

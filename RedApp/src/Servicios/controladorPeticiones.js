@@ -1,6 +1,7 @@
 var axios = require('axios');
 var https = require('https');
 var persistencia= require("../Persistencia/mongoDBConeccion");
+var configAutenticacion= require("../Config/autenticacion");
 
 /*
 exports.buscarGatewayPorCategoria = function(categoria){
@@ -31,7 +32,7 @@ exports.enviarCompraGateway = async (compraGuardada) => {
 
         };
         
-*/
+
 exports.enviarCompraGateway = async (compraGuardada) => { 
     try {
         var compraEnviar={monto:compraGuardada.monto,fechaCompra:compraGuardada.fechaCompra
@@ -41,7 +42,20 @@ exports.enviarCompraGateway = async (compraGuardada) => {
     } catch (error) {
         throw new handleError('Error en la request');
     }
-};   
+}; 
+*/
+exports.loginAutenticacion = async () => {  
+    let usuario = {nombre: configAutenticacion.NOMBRE_USUARIO
+        , contraseña: configAutenticacion.CONTRASEÑA};
+        let respuesta = await axios.post(configAutenticacion.URL_LOGIN,usuario);
+        return respuesta;
+};
+exports.validacionAutenticacion = async (req) => {
+    let token = {token: req.headers['token']}
+    let respuesta = await axios.post(configAutenticacion.URL_VALIDACION,token);
+    return respuesta.data;
+}
+
 
     
         
