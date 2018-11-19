@@ -2,14 +2,16 @@ var peticiones= require("../Servicios/controladorPeticiones");
 var persistencia= require("../Persistencia/controladorDB");
 var configAutenticacion= require("../Config/autenticacion");
 var idTransaccionGateway;
+var nombreRed;
 var idTransaccionRed;
 var idTransaccionEmisor;
 
 exports.comunicacionTransaccion= async (req) => {
     await validacionAutenticacion(req);
     try {
-        let respuesta = await comunicacionTransaccionGateway(req);
+        let respuesta= await comunicacionTransaccionGateway(req);
         idTransaccionGateway = respuesta.idTransaccion;
+        nombreRed = respuesta.nombreRed;
     } catch (error) {
         throw new Error(error.respuesta);
     }
@@ -17,14 +19,14 @@ exports.comunicacionTransaccion= async (req) => {
         let respuesta = await comunicacionTransaccionRed(req);
         idTransaccionRed = respuesta;
     } catch(error) {
-        let idborradoGate = await revertirTransaccionGateway(req.body.gateway,idTransaccionGateway);
+        let idborradoGate = await revertirTransaccionGateway(req.body.gateway, idTransaccionGateway);
         throw new Error(error.respuesta);
     }
     try {
         let respuesta = await comunicacionTransaccionEmisor(req);
         idTransaccionEmisor = respuesta;
     } catch (error) {
-        let idborradoGate = await revertirTransaccionGateway(req.body.gateway,idTransaccionGateway);
+        let idborradoGate = await revertirTransaccionGateway(req.body.gateway, idTransaccionGateway);
         let idborradoRed = await revertirTransaccionRed(idTransaccionRed);
         throw new Error(error.respuesta);
     }
@@ -32,7 +34,7 @@ exports.comunicacionTransaccion= async (req) => {
         //throw new Error('Probando el roll back');
         idTransaccionTePagoYa = await guardarTransaccion(req);
     } catch(error) {
-        let idborradoGate = await revertirTransaccionGateway(req,idTransaccionGateway);
+        let idborradoGate = await revertirTransaccionGateway(req, idTransaccionGateway);
         let idborradoRed = await revertirTransaccionRed(idTransaccionRed);
         let idborradoEmisor = await revertirTransaccionEmisor(idTransaccionEmisor);
         throw new Error(error.respuesta.data);
@@ -58,12 +60,22 @@ buscarURLGateway = async (nombreGate) => {
     return URL;
 };
 comunicacionTransaccionRed = async (req) => {
-    let respuesta = await peticiones.enviarTransaccionRed(req);
+    const RECURSO = 'Transacciones';
+    const VERBO = 'POST';
+    let URL = await buscarURLRed(nombreRed, RECURSO, VERBO);
+    let respuesta = await peticiones.enviarTransaccionRed(req, URL);
     return respuesta;
 };
 revertirTransaccionRed = async (idTransaccionEliminar) => {
-    let respuesta = await peticiones.revertirTransaccionRed(idTransaccionEliminar);
+    const RECURSO = 'Transacciones';
+    const VERBO = 'DELETE';
+    let URL = await buscarURLRed(nombreRed, RECURSO, VERBO);
+    let respuesta = await peticiones.revertirTransaccionRed(idTransaccionEliminar, URL);
     return respuesta;
+};
+buscarURLRed = async (nombreRed, recurso, verbo) => {
+    let URL = await persistencia.buscarURLRed(nombreRed, recurso, verbo);
+    return URL;
 };
 comunicacionTransaccionEmisor = async (req) => {
     let respuesta = await peticiones.enviarTransaccionEmisor(req);

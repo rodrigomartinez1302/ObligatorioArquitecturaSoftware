@@ -1,10 +1,7 @@
 var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
 var transaccion= require('../Modelo/transaccionEsquema');
 var tarjeta= require('../Modelo/tarjetaEsquema');
-var chargeBack= require('../Modelo/chargeBack');
-var configDB = require('../Config/db');
-var configapp = require('../Config/app');
+var configDB = require('../Configuracion/db');
 
 mongoose.Promise = global.Promise;
 
@@ -100,12 +97,6 @@ exports.consultarDenunciadaTarjeta = async function(req){
     let esquemaTarjeta = mongoose.model('Tarjeta');
     let consulta= await esquemaTarjeta.findOne({ 'numero': req.body.tarjeta}).exec();
     return consulta.denunciada;
-}
-exports.guardarChargeBack = async function(req){
-    let esquemaChargeBack = new chargeBack(req.body);
-    await esquemaChargeBack.save();
-    console.log('IDchargeBack:'+ esquemaChargeBack._id);
-    return esquemaChargeBack._id;
 }
 exports.consultarFechaTransaccion = async function(idTransaccion){
     let transaccionAuxiliar = mongoose.model('Transaccion');

@@ -1,7 +1,5 @@
 var axios = require('axios');
-var https = require('https');
-var persistencia= require("../Persistencia/mongoDBConeccion");
-var configAutenticacion= require("../Config/autenticacion");
+var configAutenticacion= require("../Configuracion/autenticacion");
 
 /*
 exports.buscarGatewayPorCategoria = function(categoria){

@@ -24,17 +24,17 @@ exports.registrarUsuario = async function(datosUsuario){
 exports.controlLogin = async function(req){
     let esquemaAuxiliar = await usuario.findOne({ 'nombre': req.body.nombre})
     if(!esquemaAuxiliar) {
-        throw new Error('No existe el usuario')
+        throw new Error('No existe el usuario');
     }
     let control = bcrypt.compareSync(req.body.contraseña, esquemaAuxiliar.contraseña);
     if (!control) {
-        throw new Error ('Error en contraseña')
+        throw new Error ('Error en contraseña');
     }
 }
 exports.controlUsuario = async function(nombreUsuario){
-  let esquemaAuxiliar = await usuario.findOne({ 'nombre': nombreUsuario})
+  let esquemaAuxiliar = await usuario.findOne({'nombre': nombreUsuario})
   console.log(esquemaAuxiliar);
   if(!esquemaAuxiliar) {
-      throw new Error('No existe el usuario')
+      throw new Error('No existe el usuario');
   }
 }

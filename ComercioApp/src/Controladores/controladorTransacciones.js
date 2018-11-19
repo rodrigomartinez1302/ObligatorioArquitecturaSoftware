@@ -1,7 +1,6 @@
-var peticiones= require("../Servicios/controladorPeticiones");
-var persistencia= require("../Persistencia/controladorDB");
-var configAutenticacion= require("../Config/autenticacion");
-var cache = require("../Persistencia/controladorCache");
+var peticiones= require("../Controladores/controladorPeticiones");
+var persistencia= require("../Controladores/controladorDB");
+var cache = require("../Controladores/controladorCache");
 
 exports.enviarTransaccion = async (req) => {
     let categoria = req.body.producto.categoria;
@@ -33,18 +32,5 @@ exports.realizarDevolucionTransaccion = async (req) => {
 exports.procesarChargeBack = async (req) => {
     console.log('ChargeBack solicitado IDTransaccion:'+ req.body.idTransaccion);
 }; 
-exports.loginAutenticacion = async () => {
-    try {
-        let respuesta = await peticiones.loginAutenticacion();
-        configAutenticacion.TOKEN = respuesta.data.token;
-        if(!respuesta.data.auth) {
-            throw new Error('Usuario no autenticado')
-        } else {
-            console.log('Autenticación exitosa');
-        }
-    }
-    catch(error) {
-        console.log(error.message);
-    } 
-}; 
+
 

@@ -23,8 +23,7 @@ app.listen(config.PUERTO, function() {
         });
 controladorTePagoYa.loginAutenticacion();
 
-//var json={nombre:'gateway2',URL:'http://localhost:1000x/Compras'};
-//persistencia.guardarGateway(json);
-//persistencia.buscarNombreGateway('5be6e72740613d34d85215c8');
-
+//var json={nombre:'Red1',recurso: 'Transacciones',verbo: 'DELETE', URL:'http://localhost:11000/Transacciones'};
+//persistencia.guardarRed(json);
+//persistencia.buscarURLRed('Red1');
 

@@ -1,13 +1,13 @@
 var mongoose = require('mongoose');
 var transaccion= require('../Modelo/TransaccionEsquema.js');
 var gateway= require('../Modelo/categoriaTransaccionGatewayEsquema.js');
-var db = require('../Config/db');
+var configDB = require('../Configuracion/db');
 
 mongoose.Promise = global.Promise;
 
 exports.Conectar = async   function (){ 
     try {
-        await mongoose.connect(db.URL,
+        await mongoose.connect(configDB.URL,
             { useNewUrlParser: true },)
             console.log('Connección a la base exitosa');
         }

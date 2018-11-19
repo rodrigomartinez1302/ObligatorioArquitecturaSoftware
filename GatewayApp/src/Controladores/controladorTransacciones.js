@@ -1,22 +1,15 @@
-var persistencia = require("../Persistencia/mongoDBConeccion");
-var configAutenticacion = require("../Config/autenticacion");
-var peticiones = require("../Servicios/controladorPeticiones");
-var cache = require("../Persistencia/controladorCache");
+var persistencia = require("./controladorDB");
+var controldadorCache = require("./controladorCache");
+var controladorAutenticacion = require("./controladorAutenticacion");
 
-validacionAutenticacion = async (req) => {
-    let respuesta = await peticiones.validacionAutenticacion(req);
-    if (!respuesta.auth) {
-        throw new Error(respuesta.message);
-    }
-}
 exports.guardarTransaccion = async (req) => {
-    await validacionAutenticacion(req);
+    await controladorAutenticacion.validacionAutenticacion(req);
     let idTransaccion = await persistencia.guardarTransaccion(req);
     let prefijoTarjeta = req.body.prefijoTarjeta;
-    let nombreRed = await cache.cache(prefijoTarjeta);
+    let nombreRed = await controldadorCache.cache(prefijoTarjeta);
     if(!nombreRed) {
         nombreRed = await persistencia.buscarRedPorPrefijoTarjeta(prefijoTarjeta);
-        cache.guardarEnCache(prefijoTarjeta, nombreRed);
+        controldadorCache.guardarEnCache(prefijoTarjeta, nombreRed);
     }
     let respuesta = {idTransaccion: idTransaccion, nombreRed: nombreRed};
     return respuesta;
@@ -33,6 +26,7 @@ exports.realizarDevolucionTransaccion = async (req) => {
     var idTransaccion = await persistencia.realizarChargeBack(req);
     return idTransaccion;
  }; 
+ /*
  exports.loginAutenticacion = async () => {
     try {
         let respuesta = await peticiones.loginAutenticacion();
@@ -47,5 +41,6 @@ exports.realizarDevolucionTransaccion = async (req) => {
         console.log(error.message);
     } 
 };
+*/
 
 

@@ -1,10 +1,10 @@
 var redis = require ('redis');
-var configCache= require("../Config/cache");
+var configCache= require("../Configuracion/cache");
 var cliente = redis.createClient(configCache.PUERTO);
 
-exports.cache = function(categoria) {
+exports.cache = function(idRed) {
 let promesa = new Promise (function(resolver, denegar) {
-    cliente.get(categoria, function(err, dato) {
+    cliente.get(idRed, function(err, dato) {
         if (err) {
             denegar(err);
         }
@@ -13,9 +13,9 @@ let promesa = new Promise (function(resolver, denegar) {
 });
 return promesa;
 }
-exports.guardarEnCache = function(categoria, nombreGateway) {
+exports.guardarEnCache = function(idRed, nombreRed) {
     try{
-        cliente.setex(categoria, configCache.TIEMPO_EXPIRACION, nombreGateway);
+        cliente.setex(idRed, configCache.TIEMPO_EXPIRACION, nombreRed);
     } catch (error) {
         throw new Error ('Error al guardar en cache');
     }

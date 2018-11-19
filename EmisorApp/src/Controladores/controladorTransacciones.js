@@ -1,12 +1,12 @@
-var persistencia= require("../Persistencia/mongoDBConeccion");
+var persistencia = require("./controladorDB");
 var luhn = require('luhn-alg');
-var DateDiff = require('date-diff');
-var configApp=require('../Config/app');
-var peticiones= require("../Servicios/controladorPeticiones");
-var configAutenticacion= require("../Config/autenticacion");
+var dateDiff = require('date-diff');
+var configApp =require('../Configuracion/app');
+var controladorPeticiones = require("./controladorPeticiones");
+var controladorAutenticacion = require("./controladorAutenticacion");
 
 exports.guardarTransaccion = async (req) => {
-    await validacionAutenticacion(req);
+    await controladorAutenticacion.validacionAutenticacion(req);
     await controlarValidezTarjeta(req);
     await controlarSaldoTarjeta(req);
     await controlarBloqueoTarjeta(req);
@@ -27,7 +27,7 @@ exports.realizarDevolucionTransaccion = async (req) => {
  exports.realizarChargeBack = async (req) => {
     let idTransaccion;
      try {
-         let respuesta = await peticiones.enviarChargeBackTePagoYa(req);
+         let respuesta = await controladorPeticiones.enviarChargeBackTePagoYa(req);
          idTransaccion = respuesta;
          console.log(respuesta.data);
      } catch (error) {
@@ -43,7 +43,7 @@ exports.realizarDevolucionTransaccion = async (req) => {
 controlarCantidadDiasTransaccion = async (req) => {
     let fechaTransaccion = new Date(await persistencia.consultarFechaTransaccion(req.params.id));
     let hoy = new Date();
-    let diasTranscurridos=DateDiff(fechaTransaccion,hoy);
+    let diasTranscurridos = dateDiff(fechaTransaccion,hoy);
     console.log('fechaTransaccion'+fechaTransaccion);
     console.log(hoy);
     console.log(diasTranscurridos);
@@ -89,26 +89,7 @@ exports.guardarChargeBack = async (req) => {
     var idTransaccion = await persistencia.guardarChargeBack(req);
     return idTransaccion;
 }; 
-exports.loginAutenticacion = async () => {
-    try {
-        let respuesta = await peticiones.loginAutenticacion();
-        configAutenticacion.TOKEN = respuesta.data.token;
-        if(!respuesta.data.auth) {
-            throw new Error('Usuario no autenticado')
-        } else {
-            console.log('Autenticación exitosa');
-        }
-    }
-    catch(error) {
-        console.log(error.message);
-    } 
-};
-validacionAutenticacion = async (req) => {
-    let respuesta = await peticiones.validacionAutenticacion(req);
-    if (!respuesta.auth) {
-        throw new Error(respuesta.message);
-    }
-}
+
 
    
     

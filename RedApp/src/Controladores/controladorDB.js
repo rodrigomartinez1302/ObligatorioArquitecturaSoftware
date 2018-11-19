@@ -1,8 +1,7 @@
 var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
-var transaccion= require('../Modelo/transaccionEsquema');
-var configDB=require('../Config/db');
-var configApp=require('../Config/app');
+var transaccion = require('../Modelo/transaccionEsquema');
+var configDB = require('../Configuracion/db');
+var configApp = require('../Configuracion/app');
 
 mongoose.Promise = global.Promise;
 
@@ -36,6 +35,7 @@ exports.realizarChargeBack = async function(req){
     console.log('IDTransaccion chargeback:'+ esquemaAuxiliar._id);
     return esquemaAuxiliar._id;
 }
+/*
 exports.revertirDevolucionTransaccion = async function(req){
     let esquemaAuxiliar = await transaccion.findById({ _id:req.body.idTransaccion});
     esquemaAuxiliar.devolucion = false;
@@ -43,6 +43,7 @@ exports.revertirDevolucionTransaccion = async function(req){
     console.log('IDTransaccion devolución:'+ esquemaAuxiliar._id);
     return esquemaAuxiliar._id;
 }
+*/
 exports.eliminarTransaccion =async function(req){
      let eliminado=await transaccion.findByIdAndDelete({ _id:req.params.id});
      if(!eliminado){

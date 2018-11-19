@@ -33,15 +33,15 @@ exports.enviarChargeBackGateway = async (idTransaccion) => {
     let respuesta = await axios.put(configGateway.URLCHARGEBACK, chargeBackEnviar);
     return respuesta.data;
 };
-exports.enviarTransaccionRed = async (req) => { 
+exports.enviarTransaccionRed = async (req, URL) => { 
     let transaccionEnviar = {fechaTransaccion:req.body.fechaTransaccion
         ,tarjeta:req.body.tarjeta.numero};
         let header = {headers: {token: configAutenticacion.TOKEN}}; 
-        let respuesta = await axios.post(configRed.URLTRANSACCION, transaccionEnviar, header);
+        let respuesta = await axios.post(URL, transaccionEnviar, header);
     return respuesta.data;
 };   
-exports.revertirTransaccionRed = async (idTransaccion) => {  
-    let respuesta = await axios.delete(configRed.URLTRANSACCION+'/'+idTransaccion);
+exports.revertirTransaccionRed = async (idTransaccion, URL) => {  
+    let respuesta = await axios.delete(URL +'/'+idTransaccion);
     return respuesta.data;
 };
 exports.enviarDevolucionTransaccionRed = async (idTransaccion) => {

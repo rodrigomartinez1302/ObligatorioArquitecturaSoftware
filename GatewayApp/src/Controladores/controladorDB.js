@@ -1,14 +1,13 @@
 var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
 var transaccion = require('../Modelo/TransaccionEsquema');
 var red = require('../Modelo/redEsquema');
-var db = require('../Config/db');
+var configDB = require('../Configuracion/db');
 
 mongoose.Promise = global.Promise;
 
 exports.Conectar = async function() { 
   try {
-    await mongoose.connect(db.URL,
+    await mongoose.connect(configDB.URL,
       { useNewUrlParser: true },)
     console.log('Connección a la base exitosa');
   } catch(error) {
@@ -26,7 +25,7 @@ exports.eliminarTransaccion = async function(req){
      if(!eliminado){
          throw new Error('No se encontró el id');
      }
-     console.log('IDTransaccion eliminado:'+ req.params.id);
+     console.log('IDTransaccion revertida:'+ req.params.id);
      return req.params.id;
 }
 exports.realizarDevolucionTransaccion = async function(req){
@@ -71,7 +70,7 @@ exports.realizarChargeBack = async function(req){
     });
 }
 exports.buscarRedPorPrefijoTarjeta = async function(idRed) {
-    let redAuxiliar = await mongoose.model('Emisor');
+    let redAuxiliar = await mongoose.model('Red');
     let emisorRetorno = await redAuxiliar.findOne({ 'idRed': idRed}, 'nombreRed').exec();
     if(!emisorRetorno) {
         throw new Error ('Error en busqueda de Red');

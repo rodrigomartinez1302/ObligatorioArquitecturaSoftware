@@ -1,9 +1,9 @@
-var controladorRed= require("../Controlador/controladorRed");
+var controladorTransacciones= require("../Controladores/controladorTransacciones");
 
 module.exports = function (app, db) {
   app.post('/Transacciones', async (req, res) => {
     try {
-      var idTransaccion = await controladorRed.guardarTransaccion(req);
+      var idTransaccion = await controladorTransacciones.guardarTransaccion(req);
       res.status(200).send(idTransaccion);
     } catch(error) {
       console.log(error.message);
@@ -12,7 +12,7 @@ module.exports = function (app, db) {
   });
   app.delete("/Transacciones/:id", async (req, res) => {
     try{
-      let idTransaccion = await controladorEmisor.revertirTransaccion(req);
+      let idTransaccion = await controladorTransacciones.revertirTransaccion(req);
       res.status(200).send(idTransaccion);
     }
     catch(error){
@@ -21,7 +21,7 @@ module.exports = function (app, db) {
   });
   app.put('/Transacciones/Devoluciones', async(req,res) => {
     try{
-      var respuesta = await controladorRed.realizarDevolucionTransaccion(req);
+      var respuesta = await controladorTransacciones.realizarDevolucionTransaccion(req);
       res.status(200).send(respuesta);
     }catch(error){
       res.status(500).send(error.message);
@@ -29,7 +29,7 @@ module.exports = function (app, db) {
   });
   app.put('/Transacciones/ChargeBacks', async(req,res) => {
     try {
-      var respuesta = await controladorRed.realizarChargeBack(req);
+      var respuesta = await controladorTransacciones.realizarChargeBack(req);
       res.status(200).send(respuesta);
     } catch(error) {
       res.status(500).send(error.message);

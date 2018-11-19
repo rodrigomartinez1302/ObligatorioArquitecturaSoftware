@@ -3,6 +3,7 @@ var Schema = mongoose.Schema;
 var db = require('../Config/db');
 var transaccion = require('../Modelo/transaccionEsquema');
 var gateway = require('../Modelo/URLGateWayEsquema');
+var red = require('../Modelo/URLRedEsquema');
 
 mongoose.Promise = global.Promise;
 
@@ -72,6 +73,26 @@ exports.buscarNombreGateway = async function(idTransaccion){
     let esquemaAuxiliar = mongoose.model('Transaccion');
     let consulta = await esquemaAuxiliar.findOne({ '_id': idTransaccion}).exec();
     return consulta.gateway;
+}
+exports.guardarRed = async function(redAGuardar){
+    var esquemaAuxiliar = new red(redAGuardar);
+    await esquemaAuxiliar.save(function(error,respuesta){
+        if (error) {
+            console.log(error);
+        }
+        else{
+            console.log(respuesta);
+        }
+    });
+}
+exports.buscarURLRed = async function(nombreRed, recurso, verbo){
+    let esquemaAuxiliar = mongoose.model('URLRed');
+    let consulta = await esquemaAuxiliar.findOne({ 'nombre': nombreRed, 'recurso': recurso
+    , 'verbo': verbo }).exec();
+    if(!consulta){
+        throw new Error('Error al buscar la URL de la Red: '+ nombreRed);
+    }
+    return consulta.URL;
 }
 exports.consultarIDTransaccionGateway = async function(idTransaccion){
     let esquemaAuxiliar = mongoose.model('Transaccion');

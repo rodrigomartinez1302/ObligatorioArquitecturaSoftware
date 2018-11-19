@@ -1,5 +1,5 @@
 var axios = require('axios');
-var configAutenticacion= require("../Config/autenticacion");
+var configAutenticacion= require("../Configuracion/autenticacion");
 
 exports.loginAutenticacion = async () => {  
     let usuario = {nombre: configAutenticacion.NOMBRE_USUARIO
