@@ -1,6 +1,5 @@
 var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
-var db = require('../Config/db');
+var configDB = require('../Configuracion/db');
 var transaccion = require('../Modelo/transaccionEsquema');
 var gateway = require('../Modelo/URLGateWayEsquema');
 var red = require('../Modelo/URLRedEsquema');
@@ -9,7 +8,7 @@ mongoose.Promise = global.Promise;
 
 exports.Conectar = async function (){ 
     try {
-        await mongoose.connect(db.URL,
+        await mongoose.connect(configDB.URL,
             { useNewUrlParser: true },)
             console.log('Connección a la base exitosa');
         }
@@ -18,25 +17,40 @@ exports.Conectar = async function (){
         }
 }
 exports.guardarTransaccion =async function(req){
-   var esquemaAuxiliar = new transaccion(req.body);
-   await esquemaAuxiliar.save();
-   console.log('IDtransaccion:'+ esquemaAuxiliar._id);
-   return esquemaAuxiliar._id;
+   try {
+       var esquemaAuxiliar = new transaccion(req.body);
+       await esquemaAuxiliar.save();
+       console.log('IDtransaccion:'+ esquemaAuxiliar._id);
+       return esquemaAuxiliar._id;
+    } catch (error) {
+        throw new Error('Error al guardar la transacción')
+    }   
  }   
  exports.eliminarTransaccion = async function(idTransaccionAEliminar){
-    let eliminado = await Transaccion.findByIdAndDelete(idTransaccionAEliminar);
-    if(!eliminado){
-        throw new Error('No se encontró el ID');
-    }
-    console.log('IDTransaccion eliminado:'+ idTransaccionAEliminar);
-    return idTransaccionAEliminar;
+    try {
+        let esquemaAuxiliar = await Transaccion.findByIdAndDelete(idTransaccionAEliminar);
+        if(!esquemaAuxiliar){
+            throw new Error('No se encontró el ID');
+        }
+        console.log('IDTransaccion eliminado:'+ idTransaccionAEliminar);
+        return idTransaccionAEliminar;
+    } catch (error) {
+        throw new Error('Error al eliminar la transacción')
+    } 
 }
 exports.realizarDevolucionTransaccion = async function(idTransaccion){
-    let esquemaAuxiliar = await transaccion.findById(idTransaccion);
-    esquemaAuxiliar.devolucion = true;
-    await esquemaAuxiliar.save();
-    console.log('IDTransaccion devolución:'+ esquemaAuxiliar._id);
-    return esquemaAuxiliar._id;
+    try {
+        let esquemaAuxiliar = await transaccion.findById(idTransaccion);
+        if(!esquemaAuxiliar){
+            throw new Error('No se encontró el id');
+        }
+        esquemaAuxiliar.devolucion = true;
+        await esquemaAuxiliar.save();
+        console.log('IDTransaccion devolución:'+ esquemaAuxiliar._id);
+        return esquemaAuxiliar._id;
+    } catch (error) {
+        throw new Error('Error al registrar la devolución')
+    }    
 }
 exports.realizarChargeBack = async function(idTransaccion){
     let esquemaAuxiliar = await transaccion.findById(idTransaccion);
@@ -89,7 +103,7 @@ exports.buscarURLRed = async function(nombreRed, recurso, verbo){
     let esquemaAuxiliar = mongoose.model('URLRed');
     let consulta = await esquemaAuxiliar.findOne({ 'nombre': nombreRed, 'recurso': recurso
     , 'verbo': verbo }).exec();
-    if(!consulta){
+    if(!consulta) {
         throw new Error('Error al buscar la URL de la Red: '+ nombreRed);
     }
     return consulta.URL;
@@ -97,7 +111,7 @@ exports.buscarURLRed = async function(nombreRed, recurso, verbo){
 exports.consultarIDTransaccionGateway = async function(idTransaccion){
     let esquemaAuxiliar = mongoose.model('Transaccion');
     let consulta = await esquemaAuxiliar.findById(idTransaccion).exec();
-    if(!consulta){
+    if(!consulta) {
         throw new Error('No existe la transacción')
     }
     return consulta.idTransaccionGate;
@@ -105,7 +119,7 @@ exports.consultarIDTransaccionGateway = async function(idTransaccion){
 exports.consultarIDTransaccionRed = async function(idTransaccion){
     let esquemaAuxiliar = mongoose.model('Transaccion');
     let consulta = await esquemaAuxiliar.findById(idTransaccion).exec();
-    if(!consulta){
+    if(!consulta) {
         throw new Error('No existe la transacción')
     }
     return consulta.idTransaccionRed;
@@ -113,7 +127,7 @@ exports.consultarIDTransaccionRed = async function(idTransaccion){
 exports.consultarIDTransaccionEmisor = async function(idTransaccion){
     let esquemaAuxiliar = mongoose.model('Transaccion');
     let consulta = await esquemaAuxiliar.findById(idTransaccion).exec();
-    if(!consulta){
+    if(!consulta) {
         throw new Error('No existe la transacción')
     }
     return consulta.idTransaccionEmisor;

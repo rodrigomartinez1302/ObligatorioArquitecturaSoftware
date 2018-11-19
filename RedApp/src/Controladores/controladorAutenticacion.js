@@ -16,8 +16,13 @@ exports.loginAutenticacion = async () => {
     } 
 };
 exports.validacionAutenticacion = async (req) => {
-    let respuesta = await controladorPeticiones.validacionAutenticacion(req);
-    if (!respuesta.auth) {
-        throw new Error(respuesta.message);
+    try {
+        let respuesta = await controladorPeticiones.validacionAutenticacion(req);
+        if (!respuesta.auth || respuesta.rol != configAutenticacion.ROL_AUTORIZADO) {
+            throw new Error('Error en autenticación');
+        }
+    } catch (error) {
+        throw new Error(error.message);
     }
+    
 } 

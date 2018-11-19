@@ -1,3 +1,7 @@
 module.exports = {
-    PUERTO : '10000'
+    PUERTO : '10000',
+    HORA_CIERRE_LOTES: 18,
+    MIN_CIERRE_LOTES: 0,
+    SEG_CIERRE_LOTES: 0,
+    MIL_SEG_CIERRE_LOTES: 0,
 }

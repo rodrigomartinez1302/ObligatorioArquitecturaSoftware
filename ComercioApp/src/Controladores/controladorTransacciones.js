@@ -1,4 +1,4 @@
-var peticiones= require("../Controladores/controladorPeticiones");
+var controladorPeticiones= require("../Controladores/controladorPeticiones");
 var persistencia= require("../Controladores/controladorDB");
 var cache = require("../Controladores/controladorCache");
 
@@ -10,7 +10,7 @@ exports.enviarTransaccion = async (req) => {
         cache.guardarEnCache(categoria, nombreGateway);
     }
     req.body.gateway = nombreGateway;
-    let respuesta= await peticiones.enviarTransaccionTePagoYa(req);
+    let respuesta= await controladorPeticiones.enviarTransaccionTePagoYa(req);
     return respuesta;
 };   
 seleccionarGateway = async (categoria) => {
@@ -26,11 +26,15 @@ seleccionarGateway = async (req) => {
 };  
 */
 exports.realizarDevolucionTransaccion = async (req) => {
-    let respuesta = await peticiones.enviarDevolucionTePagoYa(req);
+    let respuesta = await controladorPeticiones.enviarDevolucionTePagoYa(req);
     return respuesta;
 }; 
 exports.procesarChargeBack = async (req) => {
     console.log('ChargeBack solicitado IDTransaccion:'+ req.body.idTransaccion);
 }; 
+exports.solicitarCierreLotes = async (req) => {
+    let respuesta = await controladorPeticiones.solicitarCierreLotes(req);
+    return respuesta;
+};   
 
 

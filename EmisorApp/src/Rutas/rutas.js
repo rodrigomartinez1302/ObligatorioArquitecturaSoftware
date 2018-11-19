@@ -7,16 +7,16 @@ module.exports = function (app, db) {
       res.status(200).send(idTransaccion);
       } catch (error) {
         console.log(error.message);
-        res.status(500).send(error.message);
+        res.status(500).send('No se pudo realizar la petición');
       }
     });
     app.delete("/Transacciones/:id", async (req, res) => {
       try {
-      let idTransaccion = await controladorTransacciones.revertirTransaccion(req);
-      res.status(200).send(idTransaccion);
-      }
-      catch (error) {
-        res.status(500).send(error.message);
+        let idTransaccion = await controladorTransacciones.revertirTransaccion(req);
+        res.status(200).send(idTransaccion);
+      } catch (error) {
+        console.log(error.message);
+        res.status(500).send('No se pudo realizar la petición');
       }
     });
     app.put('/Transacciones/Devoluciones',async(req,res)=>{
@@ -24,7 +24,8 @@ module.exports = function (app, db) {
         var respuesta = await controladorTransacciones.realizarDevolucionTransaccion(req);
         res.status(200).send(respuesta);
       } catch (error) {
-        res.status(500).send(error.message);
+        console.log(error.message);
+        res.status(500).send('No se pudo realizar la petición');
       }
     });
     app.put('/Transacciones/ChargeBacks',async(req,res)=>{
@@ -32,7 +33,8 @@ module.exports = function (app, db) {
         var idTransaccionChargeBack = await controladorTransacciones.realizarChargeBack(req);
         res.status(200).send('ChargeBack solicitado IDTransacción: '+ idTransaccionChargeBack);
       } catch(error) {
-        res.status(500).send(error.message);
+        console.log(error.message);
+        res.status(500).send('No se pudo realizar la petición');
       }
     });
   }

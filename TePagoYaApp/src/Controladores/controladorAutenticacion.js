@@ -1,9 +1,9 @@
-var peticiones= require("../Controladores/controladorPeticiones");
+var controladorPeticiones= require("../Controladores/controladorPeticiones");
 var configAutenticacion= require("../Configuracion/autenticacion");
 
 exports.loginAutenticacion = async () => {
     try {
-        let respuesta = await peticiones.loginAutenticacion();
+        let respuesta = await controladorPeticiones.loginAutenticacion();
         configAutenticacion.TOKEN = respuesta.data.token;
         if(!respuesta.data.auth) {
             throw new Error('Usuario no autenticado')
@@ -16,13 +16,8 @@ exports.loginAutenticacion = async () => {
     } 
 };
 exports.validacionAutenticacion = async (req) => {
-    try {
-        let respuesta = await peticiones.validacionAutenticacion(req);
-        if (!respuesta.auth || respuesta.rol != configAutenticacion.ROL_AUTORIZADO) {
-            throw new Error('Error en autenticación');
-        }
-    } catch (error) {
-        throw new Error(error.message);
+    let respuesta = await controladorPeticiones.validacionAutenticacion(req);
+    if (!respuesta.auth) {
+        throw new Error(respuesta.message);
     }
-    
 } 

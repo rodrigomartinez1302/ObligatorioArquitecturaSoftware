@@ -1,13 +1,13 @@
 var mongoose = require('mongoose');
 var usuario = require('../Modelo/usuarioEsquema');
-var db = require('../Config/db');
+var configdb = require('../Configuracion/db');
 var bcrypt = require('bcryptjs');
 
 mongoose.Promise = global.Promise;
 
 exports.Conectar = async function() { 
   try {
-    await mongoose.connect(db.URL,
+    await mongoose.connect(configdb.URL,
       { useNewUrlParser: true },)
     console.log('Connección a la base exitosa');
   } catch(error) {
@@ -33,8 +33,11 @@ exports.controlLogin = async function(req){
 }
 exports.controlUsuario = async function(nombreUsuario){
   let esquemaAuxiliar = await usuario.findOne({'nombre': nombreUsuario})
-  console.log(esquemaAuxiliar);
   if(!esquemaAuxiliar) {
       throw new Error('No existe el usuario');
   }
+}
+exports.obtenerRol = async function(nombreUsuario){
+  let esquemaAuxiliar = await usuario.findOne({'nombre': nombreUsuario})
+  return esquemaAuxiliar.rol;
 }

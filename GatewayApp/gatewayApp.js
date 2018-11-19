@@ -1,9 +1,10 @@
 var express = require('express');
 var bodyParser = require('body-parser');
-var persistencia = require('./src/Controladores/controladorDB');
+var controladorPersistencia = require('./src/Controladores/controladorDB');
 var servicios = require('./src/Rutas/rutas');
 var configApp = require('./src/configuracion/app');
 var controladorAutenticacion = require("./src/Controladores/controladorAutenticacion");
+
 
 var app = express();
 app.use(bodyParser.json());
@@ -12,7 +13,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 servicios(app);
 
 try {
-    persistencia.Conectar();
+    controladorPersistencia.Conectar();
 } catch(error) {
     console.log("Error al conectar"); 
 }
@@ -24,3 +25,4 @@ app.listen(configApp.PUERTO, function() {
     } 
 });
 controladorAutenticacion.loginAutenticacion();
+controladorPersistencia.realizarCierreLotes(125, 18, 00);

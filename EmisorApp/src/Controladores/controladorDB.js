@@ -15,32 +15,54 @@ exports.Conectar = async function() {
   }
 }
 exports.guardarTransaccion = async function(req){
-    let esquemaTransaccion = new transaccion(req.body);
-    await esquemaTransaccion.save();
-    console.log('IDTransaccion:'+ esquemaTransaccion._id);
-    return esquemaTransaccion._id;
-}
+    try {
+        var esquemaAuxiliar = new transaccion(req.body);
+        await esquemaAuxiliar.save();
+        console.log('IDtransaccion:'+ esquemaAuxiliar._id);
+        return esquemaAuxiliar._id;
+     } catch (error) {
+         throw new Error('Error al guardar la transacción')
+     }   
+  } 
 exports.eliminarTransaccion = async function(req){
-     let eliminado=await transaccion.findByIdAndDelete({ _id:req.params.id});
-     if(!eliminado){
-         throw new Error('No se encontró el id');
-     }
-     console.log('IDTransaccion eliminado:'+ req.params.id);
-     return req.params.id;
+    try {
+        let esquemaAuxiliar = await transaccion.findByIdAndDelete({ _id:req.params.id});
+        if(!esquemaAuxiliar){
+            throw new Error('No se encontró el id');
+        }
+        console.log('IDTransaccion eliminado:'+ req.params.id);
+        return req.params.id; 
+    } catch (error) {
+        throw new Error('Error al eliminar la transacción')
+    } 
 }
 exports.realizarDevolucionTransaccion = async function(req){
-    let esquemaAuxiliar = await transaccion.findById(req.body.idTransaccion);
-    esquemaAuxiliar.devolucion = true;
-    await esquemaAuxiliar.save();
-    console.log('IDTransaccion devolución:'+ esquemaAuxiliar._id);
-    return esquemaAuxiliar._id;
+    try {
+        let esquemaAuxiliar = await transaccion.findById(req.body.idTransaccion);
+        if(!esquemaAuxiliar){
+            throw new Error('No se encontró el id');
+        }
+        esquemaAuxiliar.devolucion = true;
+        await esquemaAuxiliar.save();
+        console.log('IDTransaccion devolución:'+ esquemaAuxiliar._id);
+        return esquemaAuxiliar._id;
+    } catch (error) {
+        throw new Error('Error al registrar la devolución')
+    }    
 }
 exports.realizarChargeBack = async function(idTransaccion){
-    let esquemaAuxiliar = await transaccion.findById(idTransaccion);
-    esquemaAuxiliar.chargeBack = true;
-    await esquemaAuxiliar.save();
-    console.log('IDTransaccion chargeback:'+ esquemaAuxiliar._id);
-    return esquemaAuxiliar._id;
+    try {
+        let esquemaAuxiliar = await transaccion.findById(idTransaccion);
+        if(!eliminado){
+            throw new Error('No se encontró el id');
+        }
+        esquemaAuxiliar.chargeBack = true;
+        await esquemaAuxiliar.save();
+        console.log('IDTransaccion chargeback:'+ esquemaAuxiliar._id);
+        return esquemaAuxiliar._id;
+    } catch (error) {
+        throw new Error('Error al registrar el chargeBack')
+    } 
 }
 exports.revertirDevolucionTransaccion = async function(req){
     let esquemaAuxiliar = await transaccion.findById(req.body.idTransaccion);
@@ -60,7 +82,7 @@ exports.consultarTotalTransaccionesEnTarjeta = async function(req){
     desde.setDate(1);
     desde.setHours(0,0,0,0);
     var esquemaTransaccion = mongoose.model('Transaccion');
-    try{
+    try {
         let resultado = await esquemaTransaccion.aggregate([
             {$match:{
                 tarjeta:req.body.tarjeta,

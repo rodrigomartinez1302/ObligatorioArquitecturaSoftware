@@ -1,13 +1,13 @@
-var peticiones= require("../Servicios/controladorPeticiones");
-var persistencia= require("../Persistencia/controladorDB");
-var configAutenticacion= require("../Config/autenticacion");
+var controladorPeticiones= require("./controladorPeticiones");
+var controladorPersistencia= require("./controladorDB");
+var controladorAutenticacion = require("./controladorAutenticacion");
 var idTransaccionGateway;
 var nombreRed;
 var idTransaccionRed;
 var idTransaccionEmisor;
 
 exports.comunicacionTransaccion= async (req) => {
-    await validacionAutenticacion(req);
+    await controladorAutenticacion.validacionAutenticacion(req);
     try {
         let respuesta= await comunicacionTransaccionGateway(req);
         idTransaccionGateway = respuesta.idTransaccion;
@@ -19,90 +19,90 @@ exports.comunicacionTransaccion= async (req) => {
         let respuesta = await comunicacionTransaccionRed(req);
         idTransaccionRed = respuesta;
     } catch(error) {
-        let idborradoGate = await revertirTransaccionGateway(req.body.gateway, idTransaccionGateway);
+        await revertirTransaccionGateway(req.body.gateway, idTransaccionGateway);
         throw new Error(error.respuesta);
     }
     try {
         let respuesta = await comunicacionTransaccionEmisor(req);
         idTransaccionEmisor = respuesta;
     } catch (error) {
-        let idborradoGate = await revertirTransaccionGateway(req.body.gateway, idTransaccionGateway);
-        let idborradoRed = await revertirTransaccionRed(idTransaccionRed);
+        await revertirTransaccionGateway(req.body.gateway
+            , idTransaccionGateway);
+            await revertirTransaccionRed(idTransaccionRed);
         throw new Error(error.respuesta);
     }
     try {
-        //throw new Error('Probando el roll back');
         idTransaccionTePagoYa = await guardarTransaccion(req);
     } catch(error) {
-        let idborradoGate = await revertirTransaccionGateway(req, idTransaccionGateway);
-        let idborradoRed = await revertirTransaccionRed(idTransaccionRed);
-        let idborradoEmisor = await revertirTransaccionEmisor(idTransaccionEmisor);
-        throw new Error(error.respuesta.data);
+        await revertirTransaccionGateway(req, idTransaccionGateway);
+        await revertirTransaccionRed(idTransaccionRed);
+        await revertirTransaccionEmisor(idTransaccionEmisor);
+        throw new Error(error.message);
     }
     return idTransaccionTePagoYa;
 };   
 exports.buscarURLGateway = async (nombreGate) => {
-    let URL= await persistencia.buscarURLGateway(nombreGate);
+    let URL= await controladorPersistencia.buscarURLGateway(nombreGate);
     return URL;
 }; 
 comunicacionTransaccionGateway = async (req) => {
     let URL = await buscarURLGateway(req.body.gateway);
-    let respuesta = await peticiones.enviarTransaccionGateway(req,URL);
+    let respuesta = await controladorPeticiones.enviarTransaccionGateway(req,URL);
     return respuesta;
 };
 revertirTransaccionGateway = async (nombreGate) => {
     let URL = await buscarURLGateway(nombreGate);
-    let respuesta = await peticiones.revertirTransaccionGateway(idTransaccionGateway,URL);
+    let respuesta = await controladorPeticiones.revertirTransaccionGateway(idTransaccionGateway, URL);
     return respuesta;
 };
 buscarURLGateway = async (nombreGate) => {
-    let URL = await persistencia.buscarURLGateway(nombreGate);
+    let URL = await controladorPersistencia.buscarURLGateway(nombreGate);
     return URL;
 };
 comunicacionTransaccionRed = async (req) => {
     const RECURSO = 'Transacciones';
     const VERBO = 'POST';
     let URL = await buscarURLRed(nombreRed, RECURSO, VERBO);
-    let respuesta = await peticiones.enviarTransaccionRed(req, URL);
+    let respuesta = await controladorPeticiones.enviarTransaccionRed(req, URL);
     return respuesta;
 };
-revertirTransaccionRed = async (idTransaccionEliminar) => {
+revertirTransaccionRed = async () => {
     const RECURSO = 'Transacciones';
     const VERBO = 'DELETE';
     let URL = await buscarURLRed(nombreRed, RECURSO, VERBO);
-    let respuesta = await peticiones.revertirTransaccionRed(idTransaccionEliminar, URL);
+    let respuesta = await controladorPeticiones.revertirTransaccionRed(idTransaccionRed, URL);
     return respuesta;
 };
 buscarURLRed = async (nombreRed, recurso, verbo) => {
-    let URL = await persistencia.buscarURLRed(nombreRed, recurso, verbo);
+    let URL = await controladorPersistencia.buscarURLRed(nombreRed, recurso, verbo);
     return URL;
 };
 comunicacionTransaccionEmisor = async (req) => {
-    let respuesta = await peticiones.enviarTransaccionEmisor(req);
+    let respuesta = await controladorPeticiones.enviarTransaccionEmisor(req);
     return respuesta;
 }; 
-revertirTransaccionEmisor = async (idTransaccionEliminar) => {
-    let respuesta = await peticiones.revertirTransaccionEmisor(idTransaccionEliminar);
+revertirTransaccionEmisor = async () => {
+    let respuesta = await controladorPeticiones.revertirTransaccionEmisor(idTransaccionEmisor);
     return respuesta;
 };
 guardarTransaccion = async (req) => {
     req.body.idTransaccionGate = idTransaccionGateway;
     req.body.idTransaccionRed = idTransaccionRed;
     req.body.idTransaccionEmisor = idTransaccionEmisor;
-    let idTransaccion = await persistencia.guardarTransaccion(req);
+    let idTransaccion = await controladorPersistencia.guardarTransaccion(req);
     return idTransaccion;
 }; 
 revertirTransaccion = async (idTransaccionEliminarTePagoYa) => {
-    let idTransaccion = await persistencia.eliminarTransaccion(idTransaccionEliminarTePagoYa);
+    let idTransaccion = await controladorPersistencia.eliminarTransaccion(idTransaccionEliminarTePagoYa);
     return idTransaccion;
 }; 
 exports.ComunicacionDevolucion = async (req) => {
-    idTransaccionTePagoYa=req.body.idTransaccion;
+    idTransaccionTePagoYa = req.body.idTransaccion;
     await comunicacionDevolucionTransaccionGateway();
     await comunicacionDevolucionTransaccionRed();
     await comunicacionDevolucionTransaccionEmisor();
     try {
-        await persistencia.realizarDevolucionTransaccion(idTransaccionTePagoYa);
+        await controladorPersistencia.realizarDevolucionTransaccion(idTransaccionTePagoYa);
     } catch(error) {
         throw new Error(error.respuesta);
     }
@@ -115,7 +115,7 @@ exports.ComunicacionDevolucion = async (req) => {
         throw new Error(error.message);
     }
     try {
-        await peticiones.enviarDevolucionTransaccionGateway(idTransaccionGateway);
+        await controladorPeticiones.enviarDevolucionTransaccionGateway(idTransaccionGateway);
     } catch (error){
         throw new Error(error.message);
     }   
@@ -127,7 +127,7 @@ exports.ComunicacionDevolucion = async (req) => {
         throw new Error(error.message);
     }
     try {
-        await peticiones.enviarDevolucionTransaccionRed(idTransaccionRed);
+        await controladorPeticiones.enviarDevolucionTransaccionRed(idTransaccionRed);
     } catch (error){
         throw new Error(error.message); 
     }    
@@ -139,23 +139,23 @@ comunicacionDevolucionTransaccionEmisor = async () => {
         throw new Error(error.message);
     }
     try{
-        await peticiones.enviarDevolucionTransaccionEmisor(idTransaccionEmisor);
+        await controladorPeticiones.enviarDevolucionTransaccionEmisor(idTransaccionEmisor);
     } catch (error) {
         throw new Error(error.message);
     }
 };
  consultarIDTransaccionEmisor = async () => {
-     idTransaccionEmisor = await persistencia.consultarIDTransaccionEmisor(idTransaccionTePagoYa); 
+     idTransaccionEmisor = await controladorPersistencia.consultarIDTransaccionEmisor(idTransaccionTePagoYa); 
 };
 consultarIDTransaccionRed = async () => {
-    idTransaccionRed = await persistencia.consultarIDTransaccionRed(idTransaccionTePagoYa);
+    idTransaccionRed = await controladorPersistencia.consultarIDTransaccionRed(idTransaccionTePagoYa);
 };
 consultarIDTransaccionGateway = async () => {
-    idTransaccionGateway = await persistencia.consultarIDTransaccionGateway(idTransaccionTePagoYa);
+    idTransaccionGateway = await controladorPersistencia.consultarIDTransaccionGateway(idTransaccionTePagoYa);
 };
 
 exports.comunicacionChargeBack =  async (req) => {
-    idTransaccionTePagoYa=req.body.idTransaccion;
+    idTransaccionTePagoYa = req.body.idTransaccion;
     try { 
         await consultarIDTransaccionGateway();
     } catch (error){
@@ -187,7 +187,7 @@ exports.comunicacionChargeBack =  async (req) => {
         throw new Error(error.respuesta);
     }
     try {
-        await persistencia.realizarChargeBack(idTransaccionTePagoYa);
+        await controladorPersistencia.realizarChargeBack(idTransaccionTePagoYa);
     } catch(error) {
         throw new Error(error.respuesta);
     }
@@ -195,17 +195,23 @@ exports.comunicacionChargeBack =  async (req) => {
     return idTransaccionEmisor;
 }
 comunicacionChargeBackGateway= async (req) => {
-    await peticiones.enviarChargeBackGateway(idTransaccionGateway);
+    await controladorPeticiones.enviarChargeBackGateway(idTransaccionGateway);
 };
 comunicacionChargeBackRed= async (req) => {
-    await peticiones.enviarChargeBackRed(idTransaccionRed);
+    await controladorPeticiones.enviarChargeBackRed(idTransaccionRed);
 };
 comunicacionChargeBackComercio= async (req) => {
-    await peticiones.comunicacionChargeBackComercio(idTransaccionTePagoYa);
+    await controladorPeticiones.comunicacionChargeBackComercio(idTransaccionTePagoYa);
 };
+exports.comunicacionCierreLotes= async (req) => {
+    let URL = await buscarURLGateway(req.query.gateway);
+    await controladorPeticiones.comunicacionCierreLotes(req, 
+        'http://localhost:10000/Transacciones/CierreLotes' );
+};
+/*
 exports.loginAutenticacion = async () => {
     try {
-        let respuesta = await peticiones.loginAutenticacion();
+        let respuesta = await controladorPeticiones.loginAutenticacion();
         configAutenticacion.TOKEN = respuesta.data.token;
         if(!respuesta.data.auth) {
             throw new Error('Usuario no autenticado')
@@ -217,14 +223,15 @@ exports.loginAutenticacion = async () => {
         console.log(error.message);
     } 
 };
+
 validacionAutenticacion = async (req) => {
-    let respuesta = await peticiones.validacionAutenticacion(req);
+    let respuesta = await controladorPeticiones.validacionAutenticacion(req);
     if (!respuesta.auth) {
         throw new Error(respuesta.message);
     }
 }
 
-/*
+
 
 exports.comunicacionRevertirTransaccion = async (req) => {
     idTransaccionTePagoYa = req.params.id;
@@ -268,16 +275,16 @@ comunicacionRevertirTransaccionGateway= async (req) => {
     return respuesta;
 };
 consultarIDTransaccionEmisor= async (idTransaccion) => {
-    idTransaccionEmisor = await persistencia.consultarIDTransaccionEmisor(idTransaccion);
+    idTransaccionEmisor = await controladorPersistencia.consultarIDTransaccionEmisor(idTransaccion);
 };
 consultarIDTransaccionRed= async (idTransaccion) => {
-    idTransaccionRed = await persistencia.consultarIDTransaccionRed(idTransaccion);
+    idTransaccionRed = await controladorPersistencia.consultarIDTransaccionRed(idTransaccion);
 };
 consultaridTransaccionGateway= async (idTransaccion) => {
-    idTransaccionGateway = await persistencia.consultaridTransaccionGateway(idTransaccion);
+    idTransaccionGateway = await controladorPersistencia.consultaridTransaccionGateway(idTransaccion);
 };
 buscarNombreGateway = async (idTransaccion) => {
-    let gateway = await persistencia.buscarNombreGateway(idTransaccion);
+    let gateway = await controladorPersistencia.buscarNombreGateway(idTransaccion);
     return gateway;
 };
 exports.comunicacionChargeBack =  async (req) => {
@@ -290,8 +297,8 @@ exports.comunicacionChargeBack =  async (req) => {
     }
 }
 comunicacionChargeBackEmisor= async (req) => {
-    idTransaccionEmisor = await persistencia.consultarIDTransaccionEmisor(req.body.idTransaccion);
-    let respuesta = await peticiones.enviarChargeBackEmisor(idTransaccionEmisor);
+    idTransaccionEmisor = await controladorPersistencia.consultarIDTransaccionEmisor(req.body.idTransaccion);
+    let respuesta = await controladorPeticiones.enviarChargeBackEmisor(idTransaccionEmisor);
     return respuesta;
 };
 */

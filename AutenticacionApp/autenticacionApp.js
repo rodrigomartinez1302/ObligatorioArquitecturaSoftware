@@ -1,8 +1,8 @@
 var express = require('express');
 var bodyParser = require('body-parser');
-var persistencia = require('./src/Persistencia/controladorDB');
-var servicios = require('./src/Servicios/autenticacionRutas');
-var config = require('./src/Config/app');
+var persistencia = require('./src/Controladores/controladorDB');
+var servicios = require('./src/Rutas/rutas');
+var confignApp = require('./src/Configuracion/app');
 
 var app = express();
 app.use(bodyParser.json());
@@ -14,7 +14,7 @@ try{
 } catch(error){
     console.log("Error al conectar"); 
 }
-app.listen(config.PUERTO, function() {
+app.listen(confignApp.PUERTO, function() {
     console.log('App corriendo'); }).on('error', function(err) {
         if (err) {
             console.log('Error al levantar la app'); 
@@ -22,7 +22,7 @@ app.listen(config.PUERTO, function() {
     });
 
 
-//let auxUsuario = {nombre: '5555', contraseña: '5555'}
-//persistencia.registrarUsuario(auxUsuario);
-
+/*let auxUsuario = {nombre: '5555', contraseña: '5555', rol: 'emisor'}
+persistencia.registrarUsuario(auxUsuario);
+*/
 

@@ -1,10 +1,10 @@
 var jwt = require('jsonwebtoken');
-var persistencia = require("../Persistencia/controladorDB");
-var configApp=require('../Config/app');
+var controladorPersistencia = require("./controladorDB");
+var configApp=require('../Configuracion/app');
  
 exports.login = async (req) => {
     try {
-        await persistencia.controlLogin(req);
+        await controladorPersistencia.controlLogin(req);
     } catch(error) {
         throw new Error (error.message);
     }
@@ -33,14 +33,17 @@ exports.validar = async (req) => {
         throw new Error ('Error en token');
     }  
     try {
-        await persistencia.controlUsuario(usuario);
+        await controladorPersistencia.controlUsuario(usuario);
+        
+        
     } catch(error) {
         throw new Error (error.message);
     }
     respuesta = generarRespuestaValidar(usuario);
     return respuesta;
 }
-generarRespuestaValidar = (nombreUsuario) => {
-    let respuesta = {auth: true}; 
+generarRespuestaValidar = async (usuario) => {
+    let rol = await controladorPersistencia.obtenerRol(usuario);
+    let respuesta = {auth: true, rol: rol}; 
     return respuesta; 
 }

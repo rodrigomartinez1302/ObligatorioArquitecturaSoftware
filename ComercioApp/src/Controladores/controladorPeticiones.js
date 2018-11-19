@@ -15,15 +15,24 @@ exports.enviarDevolucionTePagoYa = async (req) => {
     let respuesta = await axios.put(configTePagoYa.URLDEVOLUCION, devolucionEnviar);
     return respuesta.data;
 };
+/*
 exports.enviarChargeBackTePagoYa = async (req) => {  
     let chargeBackEnviar = req.body;
     let respuesta = await axios.post(configTePagoYa.URLCHARGEBACK, chargeBackEnviar);
     return respuesta.data;
 };
+*/
 exports.loginAutenticacion = async () => {  
     let usuario = {nombre: configAutenticacion.NOMBRE_USUARIO
         , contraseña: configAutenticacion.CONTRASEÑA};
         let respuesta = await axios.post(configAutenticacion.URL_LOGIN, usuario);
         return respuesta;
+};
+exports.solicitarCierreLotes = async (req) => {
+    let parametro1 = configApp.RUT;
+    let parametro2 = req.params.gateway; 
+    let respuesta = await axios.get(configTePagoYa.URLCIERRELOTES + '?RUT=' + parametro1 + '&gateway=' 
+    + parametro2);
+    return respuesta.data;
 };
 

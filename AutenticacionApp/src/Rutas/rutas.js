@@ -1,5 +1,4 @@
-var controladorAutenticacion= require("../Controlador/controladorAutenticacion");
-
+var controladorAutenticacion= require("../Controladores/controladorAutenticacion");
 
 module.exports = function (app, db) {
   app.post('/Autenticaciones/Logueos', async (req, res) => {

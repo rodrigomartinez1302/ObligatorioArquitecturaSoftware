@@ -1,9 +1,9 @@
 var axios = require('axios');
-var configGateway = require("../Config/gateway");
-var configRed = require("../Config/red");
-var configEmisor = require("../Config/emisor");
-var configComercio = require("../Config/comercio");
-var configAutenticacion= require("../Config/autenticacion");
+var configGateway = require("../Configuracion/gateway");
+var configRed = require("../Configuracion/red");
+var configEmisor = require("../Configuracion/emisor");
+var configComercio = require("../Configuracion/comercio");
+var configAutenticacion= require("../Configuracion/autenticacion");
 
 exports.enviarTransaccionGateway = async (req,URL) => { 
     let prefijoTarjeta = req.body.tarjeta.numero.toString().substring(0,1);
@@ -59,7 +59,7 @@ exports.enviarTransaccionEmisor = async (req) => {
         ,tarjeta:req.body.tarjeta.numero};
         let header = {headers: {token: configAutenticacion.TOKEN}}; 
         let respuesta = await axios.post(configEmisor.URLTRANSACCION, transaccionEnviar, header);
-    return respuesta.data;
+        return respuesta.data;
 };   
 exports.revertirTransaccionEmisor = async (idTransaccion) => {  
     let respuesta = await axios.delete(configEmisor.URLTRANSACCION +'/'+idTransaccion);
@@ -86,6 +86,11 @@ exports.validacionAutenticacion = async (req) => {
     let respuesta = await axios.post(configAutenticacion.URL_VALIDACION, token);
     return respuesta.data;
 }
+exports.comunicacionCierreLotes = async (req, URL) => {
+    let parametro1 = req.query.RUT;
+    let respuesta = await axios.get(URL + '?RUT=' + parametro1);
+    return respuesta.data;
+};
 
 
 

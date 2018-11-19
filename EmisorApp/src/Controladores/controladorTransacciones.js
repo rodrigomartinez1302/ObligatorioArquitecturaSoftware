@@ -29,7 +29,6 @@ exports.realizarDevolucionTransaccion = async (req) => {
      try {
          let respuesta = await controladorPeticiones.enviarChargeBackTePagoYa(req);
          idTransaccion = respuesta;
-         console.log(respuesta.data);
      } catch (error) {
          throw new Error(error.message);
      }

@@ -15,7 +15,7 @@ exports.Conectar = async   function (){
             console.log('Error al conectar a la base');
         }
 }
-exports.guardarTransaccion = async function(require){
+/*exports.guardarTransaccion = async function(require){
     var esquemaAuxiliar = new transaccion(req.body);
        await esquemaAuxiliar.save(function(err){
         if (err) {
@@ -35,6 +35,7 @@ exports.eliminarTransaccion = function(transaccionAEliminar){
       });
       console.log('Se eliminó la Transaccion');
 }
+*/
 exports.guardarGateway = async function(gatewayAGuardar){
     var esquemaAuxiliar = new gateway(gatewayAGuardar);
     await esquemaAuxiliar.save(function(error,respuesta){

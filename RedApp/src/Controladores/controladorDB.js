@@ -16,17 +16,40 @@ exports.Conectar =async   function (){
         }
 }
 exports.guardarTransaccion = async function(req){
-    var esquemaAuxiliar = new transaccion(req.body);
-    await esquemaAuxiliar.save();
-    console.log('IDTransaccion:'+ esquemaAuxiliar._id);
-    return esquemaAuxiliar._id;
+    try {
+        var esquemaAuxiliar = new transaccion(req.body);
+        await esquemaAuxiliar.save();
+        console.log('IDtransaccion:'+ esquemaAuxiliar._id);
+        return esquemaAuxiliar._id;
+     } catch (error) {
+         throw new Error('Error al guardar la transacción')
+     }   
+  } 
+  exports.eliminarTransaccion = async function(req){
+    try { 
+        let esquemaAuxiliar=await transaccion.findByIdAndDelete({ _id:req.params.id});
+        if(!esquemaAuxiliar){
+            throw new Error('No se encontró el id');
+        }
+        console.log('IDTransaccion eliminado:'+ req.params.id);
+        return req.params.id;
+    } catch (error) {
+        throw new Error('Error al eliminar la transacción')
+    } 
 }
 exports.realizarDevolucionTransaccion = async function(req){
-    let esquemaAuxiliar = await transaccion.findById({ _id:req.body.idTransaccion});
-    esquemaAuxiliar.devolucion = true;
-    await esquemaAuxiliar.save();
-    console.log('IDTransaccion devolución:'+ esquemaAuxiliar._id);
-    return esquemaAuxiliar._id;
+    try {
+        let esquemaAuxiliar = await transaccion.findById(req.body.idTransaccion);
+        if(!esquemaAuxiliar){
+            throw new Error('No se encontró el id');
+        }
+        esquemaAuxiliar.devolucion = true;
+        await esquemaAuxiliar.save();
+        console.log('IDTransaccion devolución:'+ esquemaAuxiliar._id);
+        return esquemaAuxiliar._id;
+    } catch (error) {
+        throw new Error('Error al registrar la devolución')
+    }    
 }
 exports.realizarChargeBack = async function(req){
     let esquemaAuxiliar = await transaccion.findById(req.body.idTransaccion);
@@ -44,14 +67,7 @@ exports.revertirDevolucionTransaccion = async function(req){
     return esquemaAuxiliar._id;
 }
 */
-exports.eliminarTransaccion =async function(req){
-     let eliminado=await transaccion.findByIdAndDelete({ _id:req.params.id});
-     if(!eliminado){
-         throw new Error('No se encontró el id');
-     }
-     console.log('IDTransaccion eliminado:'+ req.params.id);
-     return req.params.id;
-}
+
 exports.controlFraude = async function(nroTarjeta){
     var resultado;
     var esquemaAuxiliar = mongoose.model('Transaccion');
