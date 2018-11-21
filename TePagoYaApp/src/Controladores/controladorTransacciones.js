@@ -205,8 +205,9 @@ comunicacionChargeBackComercio= async (req) => {
 };
 exports.comunicacionCierreLotes= async (req) => {
     let URL = await buscarURLGateway(req.query.gateway);
-    await controladorPeticiones.comunicacionCierreLotes(req, 
+    let respuesta = await controladorPeticiones.comunicacionCierreLotes(req, 
         'http://localhost:10000/Transacciones/CierreLotes' );
+        return respuesta;
 };
 /*
 exports.loginAutenticacion = async () => {

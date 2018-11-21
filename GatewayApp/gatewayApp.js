@@ -25,4 +25,4 @@ app.listen(configApp.PUERTO, function() {
     } 
 });
 controladorAutenticacion.loginAutenticacion();
-controladorPersistencia.realizarCierreLotes(125, 18, 00);
+//controladorPersistencia.realizarCierreLotes(125, 19, 15);

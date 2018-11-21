@@ -1,5 +1,5 @@
 var mongoose = require('mongoose');
-var transaccion = require('../Modelo/transaccionEsquema');
+var Transaccion = require('../Modelo/transaccionEsquema');
 var configDB = require('../Configuracion/db');
 var configApp = require('../Configuracion/app');
 
@@ -17,18 +17,18 @@ exports.Conectar =async   function (){
 }
 exports.guardarTransaccion = async function(req){
     try {
-        var esquemaAuxiliar = new transaccion(req.body);
-        await esquemaAuxiliar.save();
-        console.log('IDtransaccion:'+ esquemaAuxiliar._id);
-        return esquemaAuxiliar._id;
+        var transaccion = new Transaccion(req.body);
+        await transaccion.save();
+        console.log('IDtransaccion:'+ transaccion._id);
+        return transaccion._id;
      } catch (error) {
          throw new Error('Error al guardar la transacción')
      }   
   } 
   exports.eliminarTransaccion = async function(req){
     try { 
-        let esquemaAuxiliar=await transaccion.findByIdAndDelete({ _id:req.params.id});
-        if(!esquemaAuxiliar){
+        let transaccion=await transaccion.findByIdAndDelete({ _id:req.params.id});
+        if(!transaccion){
             throw new Error('No se encontró el id');
         }
         console.log('IDTransaccion eliminado:'+ req.params.id);
@@ -39,45 +39,35 @@ exports.guardarTransaccion = async function(req){
 }
 exports.realizarDevolucionTransaccion = async function(req){
     try {
-        let esquemaAuxiliar = await transaccion.findById(req.body.idTransaccion);
-        if(!esquemaAuxiliar){
+        let transaccion = await transaccion.findById(req.body.idTransaccion);
+        if(!transaccion){
             throw new Error('No se encontró el id');
         }
-        esquemaAuxiliar.devolucion = true;
-        await esquemaAuxiliar.save();
-        console.log('IDTransaccion devolución:'+ esquemaAuxiliar._id);
-        return esquemaAuxiliar._id;
+        transaccion.devolucion = true;
+        await transaccion.save();
+        console.log('IDTransaccion devolución:'+ transaccion._id);
+        return transaccion._id;
     } catch (error) {
         throw new Error('Error al registrar la devolución')
     }    
 }
 exports.realizarChargeBack = async function(req){
-    let esquemaAuxiliar = await transaccion.findById(req.body.idTransaccion);
-    esquemaAuxiliar.chargeBack = true;
-    await esquemaAuxiliar.save();
-    console.log('IDTransaccion chargeback:'+ esquemaAuxiliar._id);
-    return esquemaAuxiliar._id;
+    let transaccion = await transaccion.findById(req.body.idTransaccion);
+    transaccion.chargeBack = true;
+    await transaccion.save();
+    console.log('IDTransaccion chargeback:'+ transaccion._id);
+    return transaccion._id;
 }
-/*
-exports.revertirDevolucionTransaccion = async function(req){
-    let esquemaAuxiliar = await transaccion.findById({ _id:req.body.idTransaccion});
-    esquemaAuxiliar.devolucion = false;
-    await esquemaAuxiliar.save();
-    console.log('IDTransaccion devolución:'+ esquemaAuxiliar._id);
-    return esquemaAuxiliar._id;
-}
-*/
-
 exports.controlFraude = async function(nroTarjeta){
     var resultado;
-    var esquemaAuxiliar = mongoose.model('Transaccion');
+    var transaccion = mongoose.model('Transaccion');
     var desde = new Date();
     desde.setDate(desde.getDate() - configApp.DIASCONTROLFRAUDE);
     var hasta = new Date();
     //console.log(desde);
     //console.log(hasta);
     //console.log(nroTarjeta);
-    resultado = await esquemaAuxiliar.find(
+    resultado = await transaccion.find(
       {
           "fechaTransaccion":{
                 "$gte": desde,

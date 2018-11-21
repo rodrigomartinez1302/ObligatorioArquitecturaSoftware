@@ -31,7 +31,8 @@ module.exports  = function(app,db) {
   app.get('/Transacciones/CierreLotes', async(req,res) => {
     try {
       var respuesta = await controladorTransacciones.comunicacionCierreLotes(req);
-      res.status(200).send('Ok');
+      console.log(respuesta);
+      res.status(200).send(respuesta);
     } catch(error) {
       console.log(error.message);
       res.status(500).send('No se pudo realizar la petición');

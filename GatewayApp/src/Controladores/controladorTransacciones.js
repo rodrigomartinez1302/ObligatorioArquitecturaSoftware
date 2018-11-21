@@ -36,26 +36,9 @@ exports.realizarDevolucionTransaccion = async (req) => {
     return idTransaccion;
  };
  exports.solicitarCierreLotes = async (req) => {
-    let RUT = req.query.RUT;
-    let respuesta = await controladorPersistencia.realizarCierreLotes(RUT, configApp.HORA_CIERRE_LOTES
+     let RUT = req.query.RUT;
+     let resultado = await controladorPersistencia.realizarCierreLotes(RUT, configApp.HORA_CIERRE_LOTES
         , configApp.MIN_CIERRE_LOTES);
-    return respuesta;
+        return resultado;
 }; 
- /*
- exports.loginAutenticacion = async () => {
-    try {
-        let respuesta = await peticiones.loginAutenticacion();
-        configAutenticacion.TOKEN = respuesta.data.token;
-        if(!respuesta.data.auth) {
-            throw new Error('Usuario no autenticado')
-        } else {
-            console.log('Autenticación exitosa');
-        }
-    }
-    catch(error) {
-        console.log(error.message);
-    } 
-};
-*/
-
 
