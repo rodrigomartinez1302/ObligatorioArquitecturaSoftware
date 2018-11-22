@@ -26,7 +26,7 @@ exports.guardarTransaccion = async function(req){
   } 
 exports.eliminarTransaccion = async function(req){
     try {
-        let transaccion = await transaccion.findByIdAndDelete({ _id:req.params.id});
+        let transaccion = await Transaccion.findByIdAndDelete({ _id:req.params.id});
         if(!transaccion){
             throw new Error('No se encontró el id');
         }
@@ -38,7 +38,7 @@ exports.eliminarTransaccion = async function(req){
 }
 exports.realizarDevolucionTransaccion = async function(req){
     try {
-        let transaccion = await transaccion.findById(req.body.idTransaccion);
+        let transaccion = await Transaccion.findById(req.body.idTransaccion);
         if(!transaccion){
             throw new Error('No se encontró el id');
         }
@@ -52,7 +52,7 @@ exports.realizarDevolucionTransaccion = async function(req){
 }
 exports.realizarChargeBack = async function(idTransaccion){
     try {
-        let transaccion = await transaccion.findById(idTransaccion);
+        let transaccion = await Transaccion.findById(idTransaccion);
         if(!eliminado){
             throw new Error('No se encontró el id');
         }
@@ -65,7 +65,7 @@ exports.realizarChargeBack = async function(idTransaccion){
     } 
 }
 exports.revertirDevolucionTransaccion = async function(req){
-    let transaccion = await transaccion.findById(req.body.idTransaccion);
+    let transaccion = await Transaccion.findById(req.body.idTransaccion);
     transaccion.devolucion = false;
     await transaccion.save();
     console.log('IDTransaccion devolución:'+ transaccion._id);
@@ -120,12 +120,16 @@ exports.consultarDenunciadaTarjeta = async function(req){
     let consulta= await esquemaTarjeta.findOne({ 'numero': req.body.tarjeta}).exec();
     return consulta.denunciada;
 }
+exports.controlarExistenciatarjeta = async function(req){
+    let esquemaTarjeta = mongoose.model('Tarjeta');
+    let consulta= await esquemaTarjeta.findOne({ 'numero': req.body.tarjeta}).exec();
+    return consulta.numero;
+}
 exports.consultarFechaTransaccion = async function(idTransaccion){
     let transaccionAuxiliar = mongoose.model('Transaccion');
     let consulta= await transaccionAuxiliar.findOne({ '_id': idTransaccion}).exec();
     return consulta.fechaTransaccion;
 } 
-
 /* 
 Desuso
 exports.actualizarSaldoTarjeta =async function(req){

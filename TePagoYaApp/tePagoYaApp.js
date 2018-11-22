@@ -24,8 +24,9 @@ app.listen(configApp.PUERTO, function() {
     } 
 });
 controladorAutenticacion.loginAutenticacion();
+//var json={nombre:'emisor1', recurso: 'Transacciones',
+//verbo: 'POST', URL:'http://localhost:12000/Transacciones'};
+//persistencia.guardarEmisor(json);
+//persistencia.buscarURLGateway('gateway1','Transacciones','POST');
 
-//var json={nombre:'Red1',recurso: 'Transacciones',verbo: 'DELETE', URL:'http://localhost:11000/Transacciones'};
-//persistencia.guardarRed(json);
-//persistencia.buscarURLRed('Red1');
 

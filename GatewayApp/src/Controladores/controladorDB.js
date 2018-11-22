@@ -78,7 +78,7 @@ exports.realizarChargeBack = async function(req){
     }]);
         return 'Cierre de lote para RUT '+ RUT + ': $'+ resultado[0].suma;
     } catch(error) {
-        return 0;
+        throw new Error('No existen transacciones para el RUT solicitado');
     }
     /*let resultado = await transaccion.find(
         {

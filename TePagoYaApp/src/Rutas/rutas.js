@@ -31,7 +31,6 @@ module.exports  = function(app,db) {
   app.get('/Transacciones/CierreLotes', async(req,res) => {
     try {
       var respuesta = await controladorTransacciones.comunicacionCierreLotes(req);
-      console.log(respuesta);
       res.status(200).send(respuesta);
     } catch(error) {
       console.log(error.message);

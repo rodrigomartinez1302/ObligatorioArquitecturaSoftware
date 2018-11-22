@@ -37,8 +37,12 @@ exports.realizarDevolucionTransaccion = async (req) => {
  };
  exports.solicitarCierreLotes = async (req) => {
      let RUT = req.query.RUT;
+     try{
      let resultado = await controladorPersistencia.realizarCierreLotes(RUT, configApp.HORA_CIERRE_LOTES
         , configApp.MIN_CIERRE_LOTES);
         return resultado;
+     } catch (error) {
+         throw new Error(error.message);
+     }
 }; 
 

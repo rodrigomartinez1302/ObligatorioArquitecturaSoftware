@@ -10,9 +10,13 @@ exports.enviarTransaccionGateway = async (req,URL) => {
     prefijoTarjeta = parseInt(prefijoTarjeta);
     let transaccionEnviar = {monto: req.body.monto, fechaTransaccion: req.body.fechaTransaccion
         , prefijoTarjeta: prefijoTarjeta, RUT: req.body.RUT};
-        let header = {headers: {token: configAutenticacion.TOKEN}}; 
-        let respuesta = await axios.post(URL, transaccionEnviar, header);
-        return respuesta.data;
+        let header = {headers: {token: configAutenticacion.TOKEN}};
+        try { 
+            let respuesta = await axios.post(URL, transaccionEnviar, header);
+            return respuesta.data;
+        } catch (error) {
+            throw new Error('No se pudo realizar la petición');
+        } 
 };  
 exports.revertirTransaccionGateway = async (idTransaccion,URL) => { 
     let respuesta = await axios.delete(URL+'/'+idTransaccion);

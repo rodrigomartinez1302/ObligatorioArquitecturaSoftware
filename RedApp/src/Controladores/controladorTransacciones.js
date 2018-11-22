@@ -1,12 +1,29 @@
 var controladorPersistencia= require("./controladorDB");
 var configApp=require('../Configuracion/app');
 var controladorAutenticacion = require("./controladorAutenticacion");
+var controldadorCache = require("./controladorCache");
  
 exports.guardarTransaccion = async (req) => {
+    let idTransaccion;
+    let prefijoTarjeta;
+    let nombreEmisor;
+
     await controladorAutenticacion.validacionAutenticacion(req);
     await controlFraude(req);
-    var idTransaccion = await controladorPersistencia.guardarTransaccion(req);
-    return idTransaccion;
+    idTransaccion = await controladorPersistencia.guardarTransaccion(req);
+    prefijoTarjeta = req.body.tarjeta.toString().substring(1,4);
+    prefijoTarjeta = parseInt(prefijoTarjeta);
+    nombreEmisor = await controldadorCache.cache(prefijoTarjeta);
+    if(!nombreEmisor) {
+        try {
+        nombreEmisor = await controladorPersistencia.buscarEmisorPorPrefijoTarjeta(prefijoTarjeta);
+        controldadorCache.guardarEnCache(prefijoTarjeta, nombreEmisor);
+        } catch (error) {
+            throw new Error (error.message);
+        }
+    }
+    let respuesta = {idTransaccion: idTransaccion, nombreEmisor: nombreEmisor};
+    return respuesta;
 }; 
 exports.realizarDevolucionTransaccion = async (req) => {
    var idTransaccion = await controladorPersistencia.realizarDevolucionTransaccion(req);

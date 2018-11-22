@@ -12,6 +12,7 @@ exports.guardarTransaccion = async (req) => {
     await controlarBloqueoTarjeta(req);
     await controlarVencidaTarjeta(req);
     await controlarDenunciadaTarjeta(req);
+    await controlarExistenciatarjeta(req);
     let idTransaccion = await persistencia.guardarTransaccion(req);
     return idTransaccion;
 }; 
@@ -84,10 +85,18 @@ controlarDenunciadaTarjeta = async (req) => {
         throw new Error('Tarjeta denunciada');
     }
 }
+controlarExistenciatarjeta = async (req) => {
+    let tarjeta = await persistencia.controlarExistenciatarjeta(req);
+    if(!tarjeta){
+        throw new Error('No existe la tarjeta');
+    }
+}
+/*
 exports.guardarChargeBack = async (req) => {
     var idTransaccion = await persistencia.guardarChargeBack(req);
     return idTransaccion;
 }; 
+*/
 
 
    

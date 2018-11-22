@@ -24,3 +24,6 @@ app.listen(configApp.PUERTO, function() {
     } 
 });
 controladorAutenticacion.loginAutenticacion();
+
+//var json={idEmisor:'244', nombreEmisor: 'Emisor2'};
+//persistencia.guardarEmisor(json);

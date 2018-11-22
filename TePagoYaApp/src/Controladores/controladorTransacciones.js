@@ -2,33 +2,35 @@ var controladorPeticiones= require("./controladorPeticiones");
 var controladorPersistencia= require("./controladorDB");
 var controladorAutenticacion = require("./controladorAutenticacion");
 var idTransaccionGateway;
-var nombreRed;
+var red;
+var emisor;
 var idTransaccionRed;
 var idTransaccionEmisor;
 
 exports.comunicacionTransaccion= async (req) => {
     await controladorAutenticacion.validacionAutenticacion(req);
     try {
-        let respuesta= await comunicacionTransaccionGateway(req);
+        let respuesta = await comunicacionTransaccionGateway(req);
         idTransaccionGateway = respuesta.idTransaccion;
-        nombreRed = respuesta.nombreRed;
+        red = respuesta.nombreRed;
     } catch (error) {
         throw new Error(error.respuesta);
     }
     try {
         let respuesta = await comunicacionTransaccionRed(req);
-        idTransaccionRed = respuesta;
+        idTransaccionRed = respuesta.idTransaccion;
+        emisor = respuesta.nombreEmisor;
+        
     } catch(error) {
-        await revertirTransaccionGateway(req.body.gateway, idTransaccionGateway);
+        await revertirTransaccionGateway(req);
         throw new Error(error.respuesta);
     }
     try {
         let respuesta = await comunicacionTransaccionEmisor(req);
         idTransaccionEmisor = respuesta;
     } catch (error) {
-        await revertirTransaccionGateway(req.body.gateway
-            , idTransaccionGateway);
-            await revertirTransaccionRed(idTransaccionRed);
+        await revertirTransaccionGateway(req);
+        await revertirTransaccionRed();
         throw new Error(error.respuesta);
     }
     try {
@@ -41,35 +43,62 @@ exports.comunicacionTransaccion= async (req) => {
     }
     return idTransaccionTePagoYa;
 };   
-exports.buscarURLGateway = async (nombreGate) => {
+/*exports.buscarURLGateway = async (nombreGate) => {
     let URL= await controladorPersistencia.buscarURLGateway(nombreGate);
     return URL;
-}; 
+};
+*/ 
 comunicacionTransaccionGateway = async (req) => {
-    let URL = await buscarURLGateway(req.body.gateway);
-    let respuesta = await controladorPeticiones.enviarTransaccionGateway(req,URL);
-    return respuesta;
+    const RECURSO = 'Transacciones';
+    const VERBO = 'POST';
+    let URL;
+    try {
+        URL = await buscarURLGateway(req.body.gateway, RECURSO, VERBO);
+    } catch (error) {
+        throw new Error (error.message);
+    }
+    try {
+        let respuesta = await controladorPeticiones.enviarTransaccionGateway(req, URL);
+        return respuesta;
+    } catch (error) {
+        throw new Error(error.message);
+    }
 };
-revertirTransaccionGateway = async (nombreGate) => {
-    let URL = await buscarURLGateway(nombreGate);
-    let respuesta = await controladorPeticiones.revertirTransaccionGateway(idTransaccionGateway, URL);
-    return respuesta;
+revertirTransaccionGateway = async (req) => {
+    const RECURSO = 'Transacciones';
+    const VERBO = 'DELETE';
+    let URL;
+    try {
+        URL = await buscarURLGateway(req.body.gateway, RECURSO, VERBO);
+    } catch (error) {
+        throw new Error (error.message);
+    }
+    try {
+        let respuesta = await controladorPeticiones.revertirTransaccionGateway(idTransaccionGateway, URL);
+        return respuesta;
+    } catch (error) {
+        throw new Error(error.message);
+    }
 };
-buscarURLGateway = async (nombreGate) => {
-    let URL = await controladorPersistencia.buscarURLGateway(nombreGate);
-    return URL;
+buscarURLGateway = async (nombreGateway, recurso, verbo) => {
+    try {
+        let URL = await controladorPersistencia.buscarURLGateway(nombreGateway, recurso, verbo);
+        return URL;
+    } catch (error) {
+        throw new Error (error.message);
+    } 
 };
 comunicacionTransaccionRed = async (req) => {
     const RECURSO = 'Transacciones';
     const VERBO = 'POST';
-    let URL = await buscarURLRed(nombreRed, RECURSO, VERBO);
+    let URL = await buscarURLRed(red, RECURSO, VERBO);
     let respuesta = await controladorPeticiones.enviarTransaccionRed(req, URL);
     return respuesta;
 };
 revertirTransaccionRed = async () => {
     const RECURSO = 'Transacciones';
     const VERBO = 'DELETE';
-    let URL = await buscarURLRed(nombreRed, RECURSO, VERBO);
+    let URL = await buscarURLRed(red, RECURSO, VERBO);
     let respuesta = await controladorPeticiones.revertirTransaccionRed(idTransaccionRed, URL);
     return respuesta;
 };
@@ -78,6 +107,26 @@ buscarURLRed = async (nombreRed, recurso, verbo) => {
     return URL;
 };
 comunicacionTransaccionEmisor = async (req) => {
+    const RECURSO = 'Transacciones';
+    const VERBO = 'POST';
+    let URL = await buscarURLEmisor(emisor, RECURSO, VERBO);
+    let respuesta = await controladorPeticiones.enviarTransaccionEmisor(req, URL);
+    return respuesta;
+};
+revertirTransaccionEmisor = async () => {
+    const RECURSO = 'Transacciones';
+    const VERBO = 'DELETE';
+    let URL = await buscarURLEmisor(emisor, RECURSO, VERBO);
+    let respuesta = await controladorPeticiones.revertirTransaccionEmisor(idTransaccionEmisor, URL);
+    return respuesta;
+};
+buscarURLEmisor = async (nombreEmisor, recurso, verbo) => {
+    let URL = await controladorPersistencia.buscarURLEmisor(nombreEmisor, recurso, verbo);
+    return URL;
+};
+
+/*
+comunicacionTransaccionEmisor = async (req) => {
     let respuesta = await controladorPeticiones.enviarTransaccionEmisor(req);
     return respuesta;
 }; 
@@ -85,6 +134,7 @@ revertirTransaccionEmisor = async () => {
     let respuesta = await controladorPeticiones.revertirTransaccionEmisor(idTransaccionEmisor);
     return respuesta;
 };
+*/
 guardarTransaccion = async (req) => {
     req.body.idTransaccionGate = idTransaccionGateway;
     req.body.idTransaccionRed = idTransaccionRed;
@@ -204,10 +254,11 @@ comunicacionChargeBackComercio= async (req) => {
     await controladorPeticiones.comunicacionChargeBackComercio(idTransaccionTePagoYa);
 };
 exports.comunicacionCierreLotes= async (req) => {
-    let URL = await buscarURLGateway(req.query.gateway);
-    let respuesta = await controladorPeticiones.comunicacionCierreLotes(req, 
-        'http://localhost:10000/Transacciones/CierreLotes' );
-        return respuesta;
+    const RECURSO = 'Transacciones/CierreLotes';
+    const VERBO = 'GET';
+    let URL = await buscarURLGateway(req.query.gateway, RECURSO, VERBO);
+    let respuesta = await controladorPeticiones.comunicacionCierreLotes(req, URL);
+    return respuesta;
 };
 /*
 exports.loginAutenticacion = async () => {

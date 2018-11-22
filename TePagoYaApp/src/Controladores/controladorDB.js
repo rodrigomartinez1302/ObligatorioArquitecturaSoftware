@@ -3,6 +3,7 @@ var configDB = require('../Configuracion/db');
 var Transaccion = require('../Modelo/transaccionEsquema');
 var Gateway = require('../Modelo/URLGateWayEsquema');
 var Red = require('../Modelo/URLRedEsquema');
+var Emisor = require('../Modelo/URLEmisorEsquema');
 
 mongoose.Promise = global.Promise;
 
@@ -77,12 +78,16 @@ exports.guardarGateway = async function(gatewayAGuardar){
         }
     });
 }
-exports.buscarURLGateway = async function(nombreGateway){
-    let URLGatway = mongoose.model('URLGateway');
-    let consulta = await URLGatway.findOne({ 'nombre': nombreGateway}).exec();
-    let URL = consulta.URL;
-    return URL;
+exports.buscarURLGateway = async function(nombreGateway, recurso, verbo){
+    let URLGateway = mongoose.model('URLGateway');
+    let consulta = await URLGateway.findOne({ 'nombre': nombreGateway, 'recurso': recurso
+    , 'verbo': verbo }).exec();
+    if(!consulta) {
+        throw new Error('Error al buscar la URL del gateway: '+ nombreGateway);
+    }
+    return consulta.URL;
 }
+
 exports.buscarNombreGateway = async function(idTransaccion){
     let transaccion = mongoose.model('Transaccion');
     let consulta = await transaccion.findOne({ '_id': idTransaccion}).exec();
@@ -101,6 +106,7 @@ exports.guardarRed = async function(redAGuardar){
 }
 exports.buscarURLRed = async function(nombreRed, recurso, verbo){
     let URLRed = mongoose.model('URLRed');
+    
     let consulta = await URLRed.findOne({ 'nombre': nombreRed, 'recurso': recurso
     , 'verbo': verbo }).exec();
     if(!consulta) {
@@ -131,7 +137,28 @@ exports.consultarIDTransaccionEmisor = async function(idTransaccion){
         throw new Error('No existe la transacción')
     }
     return consulta.idTransaccionEmisor;
-}   
+} 
+
+exports.guardarEmisor = async function(emisorAGuardar){
+    var emisor = new Emisor(emisorAGuardar);
+    await emisor.save(function(error,respuesta){
+        if (error) {
+            console.log(error);
+        }
+        else{
+            console.log(respuesta);
+        }
+    });
+}
+exports.buscarURLEmisor = async function(nombreEmisor, recurso, verbo){
+    let URLEmisor = mongoose.model('URLEmisor');
+    let consulta = await URLEmisor.findOne({ 'nombre': nombreEmisor, 'recurso': recurso
+    , 'verbo': verbo }).exec();
+    if(!consulta) {
+        throw new Error('Error al buscar la URL de la Emisor: '+ nombreEmisor);
+    }
+    return consulta.URL;
+}
 
 
 

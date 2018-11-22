@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 var Transaccion = require('../Modelo/transaccionEsquema');
 var configDB = require('../Configuracion/db');
 var configApp = require('../Configuracion/app');
+var Emisor = require('../Modelo/emisorEsquema');
 
 mongoose.Promise = global.Promise;
 
@@ -27,7 +28,7 @@ exports.guardarTransaccion = async function(req){
   } 
   exports.eliminarTransaccion = async function(req){
     try { 
-        let transaccion=await transaccion.findByIdAndDelete({ _id:req.params.id});
+        let transaccion = await Transaccion.findByIdAndDelete({ _id:req.params.id});
         if(!transaccion){
             throw new Error('No se encontró el id');
         }
@@ -39,7 +40,7 @@ exports.guardarTransaccion = async function(req){
 }
 exports.realizarDevolucionTransaccion = async function(req){
     try {
-        let transaccion = await transaccion.findById(req.body.idTransaccion);
+        let transaccion = await Transaccion.findById(req.body.idTransaccion);
         if(!transaccion){
             throw new Error('No se encontró el id');
         }
@@ -52,7 +53,7 @@ exports.realizarDevolucionTransaccion = async function(req){
     }    
 }
 exports.realizarChargeBack = async function(req){
-    let transaccion = await transaccion.findById(req.body.idTransaccion);
+    let transaccion = await Transaccion.findById(req.body.idTransaccion);
     transaccion.chargeBack = true;
     await transaccion.save();
     console.log('IDTransaccion chargeback:'+ transaccion._id);
@@ -80,6 +81,22 @@ exports.controlFraude = async function(nroTarjeta){
     ).exec();
     return resultado.length;
  }
+ exports.guardarEmisor = async function(emisorAGuardar){
+    let emisor = new Emisor(emisorAGuardar);
+    await emisor.save(function(error,respuesta){
+        if (error) {
+            throw new Error(error.message);
+        }
+    });
+}
+exports.buscarEmisorPorPrefijoTarjeta = async function(idEmisor) {
+    let emisor = await mongoose.model('Emisor');
+    let retorno = await emisor.findOne({ 'idEmisor': idEmisor}, 'nombreEmisor').exec();
+    if(!retorno) {
+        throw new Error ('Error en busqueda de Emisor');
+    }
+    return retorno.nombreEmisor;
+}
 
 
 
