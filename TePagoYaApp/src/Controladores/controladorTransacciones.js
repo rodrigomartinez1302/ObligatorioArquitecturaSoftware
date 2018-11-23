@@ -1,6 +1,7 @@
 var controladorPeticiones= require("./controladorPeticiones");
 var controladorPersistencia= require("./controladorDB");
 var controladorAutenticacion = require("./controladorAutenticacion");
+var controladorErrores= require("./controladorErrores");
 var idTransaccionGateway;
 var red;
 var emisor;
@@ -14,7 +15,8 @@ exports.comunicacionTransaccion= async (req) => {
         idTransaccionGateway = respuesta.idTransaccion;
         red = respuesta.nombreRed;
     } catch (error) {
-        throw new Error(error.respuesta);
+        controladorErrores.registrarError(error.message);
+        throw new Error('Error al realizar la petición al gateway');
     }
     try {
         let respuesta = await comunicacionTransaccionRed(req);
@@ -23,7 +25,8 @@ exports.comunicacionTransaccion= async (req) => {
         
     } catch(error) {
         await revertirTransaccionGateway(req);
-        throw new Error(error.respuesta);
+        controladorErrores.registrarError(error.message);
+        throw new Error('Error al realizar la petición a la red');
     }
     try {
         let respuesta = await comunicacionTransaccionEmisor(req);
@@ -31,7 +34,8 @@ exports.comunicacionTransaccion= async (req) => {
     } catch (error) {
         await revertirTransaccionGateway(req);
         await revertirTransaccionRed();
-        throw new Error(error.respuesta);
+        controladorErrores.registrarError(error.message);
+        throw new Error('Error al realizar la petición al emisor');
     }
     try {
         idTransaccionTePagoYa = await guardarTransaccion(req);
@@ -39,6 +43,7 @@ exports.comunicacionTransaccion= async (req) => {
         await revertirTransaccionGateway(req, idTransaccionGateway);
         await revertirTransaccionRed(idTransaccionRed);
         await revertirTransaccionEmisor(idTransaccionEmisor);
+        controladorErrores.registrarError(error.message);
         throw new Error(error.message);
     }
     return idTransaccionTePagoYa;

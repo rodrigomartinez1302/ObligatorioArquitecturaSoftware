@@ -40,6 +40,7 @@ exports.realizarDevolucionTransaccion = async (req) => {
      }
      return req.body.idTransaccion;
  }; 
+ /*
 controlarCantidadDiasTransaccion = async (req) => {
     let fechaTransaccion = new Date(await persistencia.consultarFechaTransaccion(req.params.id));
     let hoy = new Date();
@@ -52,6 +53,7 @@ controlarCantidadDiasTransaccion = async (req) => {
         throw new Error('Cantidad días superado');
     }
 }
+*/
 controlarValidezTarjeta = (req) => {
     let control= luhn(req.body.tarjeta.toString());
     if(!control){
@@ -91,12 +93,6 @@ controlarExistenciatarjeta = async (req) => {
         throw new Error('No existe la tarjeta');
     }
 }
-/*
-exports.guardarChargeBack = async (req) => {
-    var idTransaccion = await persistencia.guardarChargeBack(req);
-    return idTransaccion;
-}; 
-*/
 
 
    

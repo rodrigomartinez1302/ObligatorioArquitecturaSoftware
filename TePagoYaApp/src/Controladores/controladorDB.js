@@ -54,26 +54,25 @@ exports.realizarDevolucionTransaccion = async function(idTransaccion){
     }    
 }
 exports.realizarChargeBack = async function(idTransaccion){
-    let transaccion = await transaccion.findById(idTransaccion);
-    transaccion.chargeBack = true;
-    await transaccion.save();
-    console.log('IDTransaccion chargeback:'+ transaccion._id);
-    return transaccion._id;
-}
-exports.revertirDevolucionTransaccion = async function(req){
-    let transaccion = await transaccion.findById(req.body.idTransaccion);
-    transaccion.devolucion = false;
-    await transaccion.save();
-    console.log('IDTransaccion devolución:'+ transaccion._id);
-    return transaccion._id;
+    try {
+        let transaccion = await Transaccion.findById(idTransaccion);
+        if(!transaccion) {
+            throw new Error('No se encontró el ID');
+        }
+        transaccion.chargeBack = true;
+        await transaccion.save();
+        console.log('IDTransaccion chargeback:'+ transaccion._id);
+        return transaccion._id;
+    } catch (error) {
+        throw new Error('Error al registrar la devolución')
+    } 
 }
 exports.guardarGateway = async function(gatewayAGuardar){
     var gateway = new Gateway(gatewayAGuardar);
     await gateway.save(function(error,respuesta){
         if (error) {
-            console.log(error);
-        }
-        else{
+            throw new Error ('Error al guardar el gateway');
+        } else {
             console.log(respuesta);
         }
     });
@@ -87,7 +86,6 @@ exports.buscarURLGateway = async function(nombreGateway, recurso, verbo){
     }
     return consulta.URL;
 }
-
 exports.buscarNombreGateway = async function(idTransaccion){
     let transaccion = mongoose.model('Transaccion');
     let consulta = await transaccion.findOne({ '_id': idTransaccion}).exec();
@@ -106,7 +104,6 @@ exports.guardarRed = async function(redAGuardar){
 }
 exports.buscarURLRed = async function(nombreRed, recurso, verbo){
     let URLRed = mongoose.model('URLRed');
-    
     let consulta = await URLRed.findOne({ 'nombre': nombreRed, 'recurso': recurso
     , 'verbo': verbo }).exec();
     if(!consulta) {

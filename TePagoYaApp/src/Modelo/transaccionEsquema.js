@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 
 var transaccionEsquema = new mongoose.Schema({
+    /*
     tarjeta:{
         numero : {type: Number, required: true},
         vencimiento : {type: String, required: true},
@@ -25,9 +26,9 @@ var transaccionEsquema = new mongoose.Schema({
         nombre : {type: String, required: true, maxlength: 250},
         categoria : {type: String, required: true, maxlength: 250},
         cantidad : {type: Number, required: true, max: 99999999}
-    },
+    },*/
     monto : {type: Number, required: true, max: 99999999},
-    fechaTransaccion : {type: Date, required: true},
+    fechaTransaccion : {type: String, required: true},
     RUT : {type: String, required: true}, 
     gateway : {type: String, required: true} ,
     idTransaccionGate : {type: String, required: true},

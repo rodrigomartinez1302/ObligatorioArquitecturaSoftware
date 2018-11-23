@@ -53,7 +53,7 @@ exports.realizarDevolucionTransaccion = async function(req){
 exports.realizarChargeBack = async function(idTransaccion){
     try {
         let transaccion = await Transaccion.findById(idTransaccion);
-        if(!eliminado){
+        if(!transaccion) {
             throw new Error('No se encontró el id');
         }
         transaccion.chargeBack = true;
@@ -63,13 +63,6 @@ exports.realizarChargeBack = async function(idTransaccion){
     } catch (error) {
         throw new Error('Error al registrar el chargeBack')
     } 
-}
-exports.revertirDevolucionTransaccion = async function(req){
-    let transaccion = await Transaccion.findById(req.body.idTransaccion);
-    transaccion.devolucion = false;
-    await transaccion.save();
-    console.log('IDTransaccion devolución:'+ transaccion._id);
-    return transaccion._id;
 }
  exports.altaTarjeta = async function(altatarjeta){
     let esquemaTarjeta= new Tarjeta(altatarjeta);

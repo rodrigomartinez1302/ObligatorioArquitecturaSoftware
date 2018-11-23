@@ -11,12 +11,8 @@ exports.enviarTransaccionGateway = async (req,URL) => {
     let transaccionEnviar = {monto: req.body.monto, fechaTransaccion: req.body.fechaTransaccion
         , prefijoTarjeta: prefijoTarjeta, RUT: req.body.RUT};
         let header = {headers: {token: configAutenticacion.TOKEN}};
-        try { 
-            let respuesta = await axios.post(URL, transaccionEnviar, header);
-            return respuesta.data;
-        } catch (error) {
-            throw new Error('No se pudo realizar la petición');
-        } 
+        let respuesta = await axios.post(URL, transaccionEnviar, header);
+        return respuesta.data;   
 };  
 exports.revertirTransaccionGateway = async (idTransaccion,URL) => { 
     let respuesta = await axios.delete(URL+'/'+idTransaccion);
@@ -91,10 +87,14 @@ exports.validacionAutenticacion = async (req) => {
     return respuesta.data;
 }
 exports.comunicacionCierreLotes = async (req, URL) => {
-    let parametro1 = req.query.RUT;
-    let respuesta = await axios.get(URL + '?RUT=' + parametro1);
+    let RUT = req.query.RUT;
+    let respuesta = await axios.get(URL + '?RUT=' + RUT);
     return respuesta.data;
 };
+exports.enviarError= async (error, URL) => { 
+    let respuesta = await axios.post(URL, error);
+    return respuesta.data;
+};   
 
 
 
