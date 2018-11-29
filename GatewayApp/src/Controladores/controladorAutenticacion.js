@@ -5,7 +5,6 @@ exports.loginAutenticacion = async () => {
   try {
     let respuesta = await controladorPeticiones.loginAutenticacion();
     configAutenticacion.TOKEN = respuesta.data.token;
-    console.log(respuesta.data.token);
     if (!respuesta.data.auth) {
       throw new Error("Usuario no autenticado");
     } else {

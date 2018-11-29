@@ -3,6 +3,7 @@ var controladorPeticiones = require("./controladorPeticiones");
 var controladorPersistencia = require("./controladorDB");
 var controladorAutenticacion = require("./controladorAutenticacion");
 var controladorEventos = require("./controladorEventos");
+var configApp = require("../Configuracion/app");
 var cuerpoSolicitudInicial;
 var idTransaccionGateway;
 var gateway;
@@ -225,6 +226,7 @@ consultarIDTransaccionEmisor = async () => {
 exports.comunicacionChargeBack = async req => {
   let idChargeBack;
   idTransaccionTePagoYa = req.body.idTransaccion;
+  await controlarCantidadDiasChargeBack();
   await buscarAplicativos();
   await comunicacionChargeBackGateway();
   await comunicacionChargeBackRed();
@@ -360,10 +362,21 @@ controlarCantidad = async req => {
     controladorEventos.registrarError(mensajeError);
     throw new Error(mensajeError);
   }
-  console.log(req.body.monto);
   if (req.body.monto < 1) {
     mensajeError = "el monto no puede ser un valor negativo";
     controladorEventos.registrarError(mensajeError);
     throw new Error(mensajeError);
+  }
+};
+controlarCantidadDiasChargeBack = async () => {
+  let fechaTransaccion = await controladorPersistencia.consultarFechaTransaccion(
+    idTransaccionTePagoYa
+  );
+  fechaTransaccion = moment(fechaTransaccion);
+  let hoy = moment();
+  let diasTranscurridos = hoy.diff(fechaTransaccion, "days");
+  let control = diasTranscurridos < configApp.DIAS_CHARGEBACK;
+  if (!control) {
+    throw new Error("Cantidad días superado");
   }
 };

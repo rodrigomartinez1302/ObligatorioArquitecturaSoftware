@@ -20,6 +20,7 @@ exports.guardarTransaccion = async function(transaccionAGuardar) {
     console.log("IDtransaccion:" + transaccion._id);
     return transaccion._id;
   } catch (error) {
+    console.log(error.message);
     throw new Error("Error al guardar la transacción");
   }
 };
@@ -128,4 +129,11 @@ exports.buscarAplicativos = async function(idTransaccion) {
     comercio: transaccion.comercio
   };
   return aplicativos;
+};
+exports.consultarFechaTransaccion = async function(idTransaccion) {
+  let transaccionAuxiliar = mongoose.model("Transaccion");
+  let consulta = await transaccionAuxiliar
+    .findOne({ _id: idTransaccion })
+    .exec();
+  return consulta.fechaTransaccion;
 };
