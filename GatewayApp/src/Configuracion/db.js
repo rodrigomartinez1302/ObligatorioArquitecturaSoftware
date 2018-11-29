@@ -1,3 +1,3 @@
 module.exports = {
-    URL : 'mongodb://localhost:27017/dbGateway'
-}
+  URL: "mongodb://localhost:27017/dbGateway"
+};

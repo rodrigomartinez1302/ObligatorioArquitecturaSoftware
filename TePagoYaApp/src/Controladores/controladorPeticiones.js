@@ -1,103 +1,98 @@
-var axios = require('axios');
-var configGateway = require("../Configuracion/gateway");
-var configRed = require("../Configuracion/red");
-var configEmisor = require("../Configuracion/emisor");
-var configComercio = require("../Configuracion/comercio");
-var configAutenticacion= require("../Configuracion/autenticacion");
+var axios = require("axios");
+var configAutenticacion = require("../Configuracion/autenticacion");
 
-exports.enviarTransaccionGateway = async (req,URL) => { 
-    let prefijoTarjeta = req.body.tarjeta.numero.toString().substring(0,1);
-    prefijoTarjeta = parseInt(prefijoTarjeta);
-    let transaccionEnviar = {monto: req.body.monto, fechaTransaccion: req.body.fechaTransaccion
-        , prefijoTarjeta: prefijoTarjeta, RUT: req.body.RUT};
-        let header = {headers: {token: configAutenticacion.TOKEN}};
-        let respuesta = await axios.post(URL, transaccionEnviar, header);
-        return respuesta.data;   
-};  
-exports.revertirTransaccionGateway = async (idTransaccion,URL) => { 
-    let respuesta = await axios.delete(URL+'/'+idTransaccion);
+exports.enviarTransaccionGateway = async (transaccionAEnviar, URL) => {
+  let header = { headers: { token: configAutenticacion.TOKEN } };
+  try {
+    let respuesta = await axios.post(URL, transaccionAEnviar, header);
     return respuesta.data;
+  } catch (error) {
+    throw new Error("Error al realizar la peticion a: " + URL);
+  }
 };
-exports.enviarDevolucionTransaccionGateway = async (idTransaccion) => {
-    let devolucionTransaccionEnviar = {idTransaccion:idTransaccion}; 
-    let respuesta = await axios.put(configGateway.URLDEVOLUCIONES, devolucionTransaccionEnviar);
-    return respuesta.data;
+
+exports.enviarDevolucionTransaccionGateway = async (idTransaccion, URL) => {
+  let header = { headers: { token: configAutenticacion.TOKEN } };
+  let devolucionTransaccionEnviar = { idTransaccion: idTransaccion };
+  let respuesta = await axios.put(URL, devolucionTransaccionEnviar, header);
+  return respuesta.data;
 };
-exports.enviarDevolucionTransaccionGateway = async (idTransaccion) => {
-    let devolucionTransaccionEnviar = {idTransaccion:idTransaccion}; 
-    let respuesta = await axios.put(configGateway.URLDEVOLUCIONES, devolucionTransaccionEnviar);
-    return respuesta.data;
+exports.enviarChargeBackGateway = async (idTransaccion, URL) => {
+  let header = { headers: { token: configAutenticacion.TOKEN } };
+  let chargeBackEnviar = { idTransaccion: idTransaccion };
+  let respuesta = await axios.put(URL, chargeBackEnviar, header);
+  return respuesta.data;
 };
-exports.enviarChargeBackGateway = async (idTransaccion) => { 
-    let chargeBackEnviar = {idTransaccion:idTransaccion};
-    let respuesta = await axios.put(configGateway.URLCHARGEBACK, chargeBackEnviar);
+exports.enviarTransaccionRed = async (solicitudInicial, URL) => {
+  let transaccionEnviar = {
+    fechaTransaccion: solicitudInicial.fechaTransaccion,
+    tarjeta: solicitudInicial.tarjeta.numero
+  };
+  let header = { headers: { token: configAutenticacion.TOKEN } };
+  try {
+    let respuesta = await axios.post(URL, transaccionEnviar, header);
     return respuesta.data;
+  } catch (error) {
+    throw new Error("Error al realizar la peticion a: " + URL);
+  }
 };
-exports.enviarTransaccionRed = async (req, URL) => { 
-    let transaccionEnviar = {fechaTransaccion:req.body.fechaTransaccion
-        ,tarjeta:req.body.tarjeta.numero};
-        let header = {headers: {token: configAutenticacion.TOKEN}}; 
-        let respuesta = await axios.post(URL, transaccionEnviar, header);
-    return respuesta.data;
-};   
-exports.revertirTransaccionRed = async (idTransaccion, URL) => {  
-    let respuesta = await axios.delete(URL +'/'+idTransaccion);
-    return respuesta.data;
+exports.enviarDevolucionTransaccionRed = async (idTransaccion, URL) => {
+  let header = { headers: { token: configAutenticacion.TOKEN } };
+  let devolucionTransaccionEnviar = { idTransaccion: idTransaccion };
+  let respuesta = await axios.put(URL, devolucionTransaccionEnviar, header);
+  return respuesta.data;
 };
-exports.enviarDevolucionTransaccionRed = async (idTransaccion) => {
-    let devolucionTransaccionEnviar = {idTransaccion:idTransaccion};  
-    let respuesta = await axios.put(configRed.URLDEVOLUCIONES, devolucionTransaccionEnviar);
-    return respuesta.data;
+exports.enviarChargeBackRed = async (idTransaccion, URL) => {
+  let header = { headers: { token: configAutenticacion.TOKEN } };
+  let chargeBackEnviar = { idTransaccion: idTransaccion };
+  let respuesta = await axios.put(URL, chargeBackEnviar, header);
+  return respuesta.data;
 };
-exports.enviarChargeBackRed = async (idTransaccion) => { 
-    let chargeBackEnviar = {idTransaccion:idTransaccion};
-    let respuesta = await axios.put(configRed.URLCHARGEBACK, chargeBackEnviar);
+exports.enviarTransaccionEmisor = async (solicitudInicial, URL) => {
+  let transaccionEnviar = {
+    monto: solicitudInicial.monto,
+    fechaTransaccion: solicitudInicial.fechaTransaccion,
+    tarjeta: solicitudInicial.tarjeta.numero
+  };
+  let header = { headers: { token: configAutenticacion.TOKEN } };
+  try {
+    let respuesta = await axios.post(URL, transaccionEnviar, header);
     return respuesta.data;
+  } catch (error) {
+    throw new Error("Error al realizar la peticion a: " + URL);
+  }
 };
-exports.enviarTransaccionEmisor = async (req) => { 
-    let transaccionEnviar = {monto:req.body.monto,fechaTransaccion:req.body.fechaTransaccion
-        ,tarjeta:req.body.tarjeta.numero};
-        let header = {headers: {token: configAutenticacion.TOKEN}}; 
-        let respuesta = await axios.post(configEmisor.URLTRANSACCION, transaccionEnviar, header);
-        return respuesta.data;
-};   
-exports.revertirTransaccionEmisor = async (idTransaccion) => {  
-    let respuesta = await axios.delete(configEmisor.URLTRANSACCION +'/'+idTransaccion);
-    return respuesta.data;
+exports.enviarDevolucionTransaccionEmisor = async (idTransaccion, URL) => {
+  let header = { headers: { token: configAutenticacion.TOKEN } };
+  let devolucionTransaccionEnviar = { idTransaccion: idTransaccion };
+  let respuesta = await axios.put(URL, devolucionTransaccionEnviar, header);
+  return respuesta.data;
 };
-exports.enviarDevolucionTransaccionEmisor = async (idTransaccion) => {
-    let devolucionTransaccionEnviar = {idTransaccion:idTransaccion};  
-    let respuesta = await axios.put(configEmisor.URLDEVOLUCIONES, devolucionTransaccionEnviar);
-    return respuesta.data;
+exports.enviarChargeBackComercio = async (idTransaccion, URL) => {
+  let header = { headers: { token: configAutenticacion.TOKEN } };
+  let chargeBackEnviar = { idTransaccion: idTransaccion };
+  let respuesta = await axios.post(URL, chargeBackEnviar, header);
+  return respuesta.data;
 };
-exports.comunicacionChargeBackComercio = async (idTransaccion) => { 
-    let chargeBackEnviar = {idTransaccion:idTransaccion};
-    let respuesta = await axios.post(configComercio.URLCHARGEBACK, chargeBackEnviar);
-    return respuesta.data;
-};
-exports.loginAutenticacion = async () => {  
-    let usuario = {nombre: configAutenticacion.NOMBRE_USUARIO
-        , contraseña: configAutenticacion.CONTRASEÑA};
-        let respuesta = await axios.post(configAutenticacion.URL_LOGIN,usuario);
-        return respuesta;
-};
-exports.validacionAutenticacion = async (req) => {
-    let token = {token: req.headers['token']}
-    let respuesta = await axios.post(configAutenticacion.URL_VALIDACION, token);
-    return respuesta.data;
-}
 exports.comunicacionCierreLotes = async (req, URL) => {
-    let RUT = req.query.RUT;
-    let respuesta = await axios.get(URL + '?RUT=' + RUT);
-    return respuesta.data;
+  let RUT = req.query.RUT;
+  let respuesta = await axios.get(URL + "?RUT=" + RUT);
+  return respuesta.data;
 };
-exports.enviarError= async (error, URL) => { 
-    let respuesta = await axios.post(URL, error);
-    return respuesta.data;
-};   
-
-
-
-
-    
-        
+exports.loginAutenticacion = async () => {
+  let usuario = {
+    nombre: configAutenticacion.NOMBRE_USUARIO,
+    contraseña: configAutenticacion.CONTRASEÑA
+  };
+  let respuesta = await axios.post(configAutenticacion.URL_LOGIN, usuario);
+  return respuesta;
+};
+exports.validacionAutenticacion = async req => {
+  let token = { token: req.headers["token"] };
+  let respuesta = await axios.post(configAutenticacion.URL_VALIDACION, token);
+  return respuesta.data;
+};
+exports.enviarEvento = async (evento, URL) => {
+  let respuesta = await axios.post(URL, evento);
+  return respuesta.data;
+};

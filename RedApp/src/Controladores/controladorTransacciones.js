@@ -1,67 +1,69 @@
-var controladorPersistencia= require("./controladorDB");
-var configApp=require('../Configuracion/app');
+var controladorPersistencia = require("./controladorDB");
+var configApp = require("../Configuracion/app");
 var controladorAutenticacion = require("./controladorAutenticacion");
 var controldadorCache = require("./controladorCache");
- 
-exports.guardarTransaccion = async (req) => {
-    let idTransaccion;
-    let prefijoTarjeta;
-    let nombreEmisor;
+var controladorPeticiones = require("../Controladores/controladorPeticiones");
+var controladorEventos = require("./controladorEventos");
+var moment = require("moment");
 
-    await controladorAutenticacion.validacionAutenticacion(req);
-    await controlFraude(req);
-    idTransaccion = await controladorPersistencia.guardarTransaccion(req);
-    prefijoTarjeta = req.body.tarjeta.toString().substring(1,4);
-    prefijoTarjeta = parseInt(prefijoTarjeta);
-    nombreEmisor = await controldadorCache.cache(prefijoTarjeta);
-    if(!nombreEmisor) {
-        try {
-        nombreEmisor = await controladorPersistencia.buscarEmisorPorPrefijoTarjeta(prefijoTarjeta);
-        controldadorCache.guardarEnCache(prefijoTarjeta, nombreEmisor);
-        } catch (error) {
-            throw new Error (error.message);
-        }
-    }
-    let respuesta = {idTransaccion: idTransaccion, nombreEmisor: nombreEmisor};
-    return respuesta;
-}; 
-exports.realizarDevolucionTransaccion = async (req) => {
-   var idTransaccion = await controladorPersistencia.realizarDevolucionTransaccion(req);
-   return idTransaccion;
-}; 
-exports.revertirTransaccion = async (req) => {
-    var idTransaccion = await controladorPersistencia.eliminarTransaccion(req);
-    return idTransaccion;
-}; 
-exports.realizarChargeBack = async (req) => {
-    var idTransaccion = await controladorPersistencia.realizarChargeBack(req);
-    return idTransaccion;
- }; 
-controlFraude = async (req) => { 
-    let cantTransacciones = await controladorPersistencia.controlFraude(req.body.tarjeta);
-    if(cantTransacciones > configApp.CANTIDADTRX) {
-        throw new Error('Control Fraude: cantidad transacciones excedida');
-    }
-}; 
-/*
-exports.loginAutenticacion = async () => {
-    try {
-        let respuesta = await controladorPeticiones.loginAutenticacion();
-        configAutenticacion.TOKEN = respuesta.data.token;
-        if(!respuesta.data.auth) {
-            throw new Error('Usuario no autenticado')
-        } else {
-            console.log('Autenticación exitosa');
-        }
-    }
-    catch(error) {
-        console.log(error.message);
-    } 
+exports.comunicacionTransaccion = async req => {
+  let nombreEmisor;
+  let cuerpoMensaje;
+  let idTransaccion;
+  await controladorAutenticacion.validacionAutenticacion(req);
+  await controlFraude(req);
+  nombreEmisor = await buscarRedPorPrefijoTarjeta(req);
+  cuerpoMensaje = { nombreEmisor: nombreEmisor };
+  await controladorPeticiones.enviarTransaccionTePagoYa(cuerpoMensaje);
+  idTransaccion = await controladorPersistencia.guardarTransaccion(req);
+  controladorEventos.registrarLog("IDtransaccion:" + idTransaccion);
+  return idTransaccion;
 };
-validacionAutenticacion = async (req) => {
-    let respuesta = await controladorPeticiones.validacionAutenticacion(req);
-    if (!respuesta.auth) {
-        throw new Error(respuesta.message);
+buscarRedPorPrefijoTarjeta = async req => {
+  let prefijoTarjeta = obtenerPrefijoTarjeta(req);
+  let nombreEmisor = await controldadorCache.cache(prefijoTarjeta);
+  if (!nombreEmisor) {
+    try {
+      nombreEmisor = await controladorPersistencia.buscarEmisorPorPrefijoTarjeta(
+        prefijoTarjeta
+      );
+      controldadorCache.guardarEnCache(prefijoTarjeta, nombreEmisor);
+    } catch (error) {
+      throw new Error(error.message);
     }
-}
-*/
+  }
+  return nombreEmisor;
+};
+obtenerPrefijoTarjeta = req => {
+  let prefijoTarjeta = req.body.tarjeta.toString().substring(1, 4);
+  prefijoTarjeta = parseInt(prefijoTarjeta);
+  return prefijoTarjeta;
+};
+exports.realizarDevolucionTransaccion = async req => {
+  await controladorAutenticacion.validacionAutenticacion(req);
+  let idTransaccion = await controladorPersistencia.realizarDevolucionTransaccion(
+    req
+  );
+  return idTransaccion;
+};
+exports.realizarChargeBack = async req => {
+  let idTransaccion = await controladorPersistencia.realizarChargeBack(req);
+  return idTransaccion;
+};
+controlFraude = async req => {
+  let desde = moment();
+  let tarjeta;
+  let cantTransaccionesPermitidas;
+  let cantTransacciones;
+  desde.subtract(configApp.DIASCONTROL_FRAUDE, "d");
+  desde = desde.format();
+  tarjeta = req.body.tarjeta;
+  cantTransacciones = await controladorPersistencia.cantidadTransacciones(
+    tarjeta,
+    desde
+  );
+  cantTransaccionesPermitidas = await controladorPersistencia.cantidadTRXPermitidas();
+  if (cantTransacciones >= cantTransaccionesPermitidas) {
+    throw new Error("Control Fraude: cantidad transacciones excedida");
+  }
+};

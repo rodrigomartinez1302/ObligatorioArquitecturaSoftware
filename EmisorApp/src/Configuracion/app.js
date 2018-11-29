@@ -1,4 +1,4 @@
 module.exports = {
-    PUERTO : '12000',
-    DIASDEVOLUCION:30,
-}
+  PUERTO: "12000",
+  DIASDEVOLUCION: 30
+};

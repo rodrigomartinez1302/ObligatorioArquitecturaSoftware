@@ -1,8 +1,8 @@
-var mongoose = require('mongoose');
+var mongoose = require("mongoose");
 
 var UsuarioEsquema = new mongoose.Schema({
-    nombre : {type: String, required: true},
-    contraseña : {type: String, required: true},
-    rol : {type: String, required: true}
+  nombre: { type: String, required: true },
+  contraseña: { type: String, required: true },
+  rol: { type: String, required: true }
 });
-module.exports = mongoose.model('Usuario', UsuarioEsquema);
+module.exports = mongoose.model("Usuario", UsuarioEsquema);

@@ -1,361 +1,369 @@
-var controladorPeticiones= require("./controladorPeticiones");
-var controladorPersistencia= require("./controladorDB");
+var moment = require("moment");
+var controladorPeticiones = require("./controladorPeticiones");
+var controladorPersistencia = require("./controladorDB");
 var controladorAutenticacion = require("./controladorAutenticacion");
-var controladorErrores= require("./controladorErrores");
+var controladorEventos = require("./controladorEventos");
+var cuerpoSolicitudInicial;
 var idTransaccionGateway;
-var red;
-var emisor;
+var gateway;
 var idTransaccionRed;
+var red;
 var idTransaccionEmisor;
+var emisor;
+var comercio;
 
-exports.comunicacionTransaccion= async (req) => {
-    await controladorAutenticacion.validacionAutenticacion(req);
-    try {
-        let respuesta = await comunicacionTransaccionGateway(req);
-        idTransaccionGateway = respuesta.idTransaccion;
-        red = respuesta.nombreRed;
-    } catch (error) {
-        controladorErrores.registrarError(error.message);
-        throw new Error('Error al realizar la petición al gateway');
-    }
-    try {
-        let respuesta = await comunicacionTransaccionRed(req);
-        idTransaccionRed = respuesta.idTransaccion;
-        emisor = respuesta.nombreEmisor;
-        
-    } catch(error) {
-        await revertirTransaccionGateway(req);
-        controladorErrores.registrarError(error.message);
-        throw new Error('Error al realizar la petición a la red');
-    }
-    try {
-        let respuesta = await comunicacionTransaccionEmisor(req);
-        idTransaccionEmisor = respuesta;
-    } catch (error) {
-        await revertirTransaccionGateway(req);
-        await revertirTransaccionRed();
-        controladorErrores.registrarError(error.message);
-        throw new Error('Error al realizar la petición al emisor');
-    }
-    try {
-        idTransaccionTePagoYa = await guardarTransaccion(req);
-    } catch(error) {
-        await revertirTransaccionGateway(req, idTransaccionGateway);
-        await revertirTransaccionRed(idTransaccionRed);
-        await revertirTransaccionEmisor(idTransaccionEmisor);
-        controladorErrores.registrarError(error.message);
-        throw new Error(error.message);
-    }
+exports.comunicacionTransaccion = async req => {
+  let idTransaccionTePagoYa;
+  await controladorAutenticacion.validacionAutenticacion(req);
+  await controlarFechaPeticion(req);
+  await controlarCantidad(req);
+  cuerpoSolicitudInicial = req.body;
+  gateway = req.body.nombreGateway;
+  await comunicacionTransaccionGateway(req);
+  try {
+    idTransaccionTePagoYa = await guardarTransaccion(req);
+    controladorEventos.registrarLog("IDtransaccion:" + idTransaccionTePagoYa);
     return idTransaccionTePagoYa;
-};   
-/*exports.buscarURLGateway = async (nombreGate) => {
-    let URL= await controladorPersistencia.buscarURLGateway(nombreGate);
+  } catch (error) {
+    controladorEventos.registrarError(error.message);
+    throw new Error(error.message);
+  }
+};
+comunicacionTransaccionGateway = async req => {
+  let transaccionEnviar;
+  let respuesta;
+  let URL;
+  const RECURSO = "Transacciones";
+  const VERBO = "POST";
+  red = req.body.nombreRed;
+  try {
+    URL = await buscarURLAplicativo(gateway, RECURSO, VERBO);
+  } catch (error) {
+    controladorEventos.registrarError(error.message);
+    throw new Error(error.message);
+  }
+  try {
+    transaccionEnviar = await crearCuerpoTransaccionGateway(
+      cuerpoSolicitudInicial
+    );
+    respuesta = await controladorPeticiones.enviarTransaccionGateway(
+      transaccionEnviar,
+      URL
+    );
+    idTransaccionGateway = respuesta;
+  } catch (error) {
+    controladorEventos.registrarError(error.message);
+    throw new Error(error.message);
+  }
+};
+exports.comunicacionTransaccionRed = async req => {
+  await controladorAutenticacion.validacionAutenticacion(req);
+  let URL;
+  let respuesta;
+  const RECURSO = "Transacciones";
+  const VERBO = "POST";
+  red = req.body.nombreRed;
+  try {
+    URL = await buscarURLAplicativo(red, RECURSO, VERBO);
+  } catch (error) {
+    controladorEventos.registrarError(error.message);
+    throw new Error(error.message);
+  }
+  try {
+    respuesta = await controladorPeticiones.enviarTransaccionRed(
+      cuerpoSolicitudInicial,
+      URL
+    );
+    idTransaccionRed = respuesta;
+  } catch (error) {
+    controladorEventos.registrarError(error.message);
+    throw new Error(error.message);
+  }
+};
+exports.comunicacionTransaccionEmisor = async req => {
+  await controladorAutenticacion.validacionAutenticacion(req);
+  let URL;
+  emisor = req.body.nombreEmisor;
+  const RECURSO = "Transacciones";
+  const VERBO = "POST";
+  try {
+    URL = await buscarURLAplicativo(emisor, RECURSO, VERBO);
+  } catch (error) {
+    controladorEventos.registrarError(error.message);
+    throw new Error(error.message);
+  }
+  try {
+    let respuesta = await controladorPeticiones.enviarTransaccionEmisor(
+      cuerpoSolicitudInicial,
+      URL
+    );
+    idTransaccionEmisor = respuesta;
+  } catch (error) {
+    controladorEventos.registrarError(error.message);
+    throw new Error(error.message);
+  }
+};
+buscarURLAplicativo = async (nombreAplicativo, recurso, verbo) => {
+  let URL;
+  try {
+    URL = await controladorPersistencia.buscarURLAplicativo(
+      nombreAplicativo,
+      recurso,
+      verbo
+    );
     return URL;
+  } catch (error) {
+    controladorEventos.registrarError(error.message);
+    throw new Error(error.message);
+  }
 };
-*/ 
-comunicacionTransaccionGateway = async (req) => {
-    const RECURSO = 'Transacciones';
-    const VERBO = 'POST';
-    let URL;
-    try {
-        URL = await buscarURLGateway(req.body.gateway, RECURSO, VERBO);
-    } catch (error) {
-        throw new Error (error.message);
-    }
-    try {
-        let respuesta = await controladorPeticiones.enviarTransaccionGateway(req, URL);
-        return respuesta;
-    } catch (error) {
-        throw new Error(error.message);
-    }
+guardarTransaccion = async req => {
+  let transaccionAGuardar;
+  let idTransaccion;
+  transaccionAGuardar = crearTransaccionTePagoYa(cuerpoSolicitudInicial);
+  idTransaccion = await controladorPersistencia.guardarTransaccion(
+    transaccionAGuardar
+  );
+  return idTransaccion;
 };
-revertirTransaccionGateway = async (req) => {
-    const RECURSO = 'Transacciones';
-    const VERBO = 'DELETE';
-    let URL;
-    try {
-        URL = await buscarURLGateway(req.body.gateway, RECURSO, VERBO);
-    } catch (error) {
-        throw new Error (error.message);
-    }
-    try {
-        let respuesta = await controladorPeticiones.revertirTransaccionGateway(idTransaccionGateway, URL);
-        return respuesta;
-    } catch (error) {
-        throw new Error(error.message);
-    }
+exports.ComunicacionDevolucion = async req => {
+  let idDevolucion;
+  idTransaccionTePagoYa = req.body.idTransaccion;
+  await buscarAplicativos();
+  await comunicacionDevolucionTransaccionGateway();
+  await comunicacionDevolucionTransaccionRed();
+  await comunicacionDevolucionTransaccionEmisor();
+  try {
+    idDevolucion = await controladorPersistencia.realizarDevolucionTransaccion(
+      idTransaccionTePagoYa
+    );
+    controladorEventos.registrarLog("IDTransaccion devolución:" + idDevolucion);
+  } catch (error) {
+    controladorEventos.registrarError(error.message);
+    throw new Error(error.respuesta);
+  }
+  return idTransaccionTePagoYa;
 };
-buscarURLGateway = async (nombreGateway, recurso, verbo) => {
-    try {
-        let URL = await controladorPersistencia.buscarURLGateway(nombreGateway, recurso, verbo);
-        return URL;
-    } catch (error) {
-        throw new Error (error.message);
-    } 
+comunicacionDevolucionTransaccionGateway = async () => {
+  let URL;
+  const RECURSO = "Transacciones/Devoluciones";
+  const VERBO = "PUT";
+  try {
+    await consultarIDTransaccionGateway();
+  } catch (error) {
+    controladorEventos.registrarError(error.message);
+    throw new Error(error.message);
+  }
+  try {
+    URL = await buscarURLAplicativo(gateway, RECURSO, VERBO);
+    await controladorPeticiones.enviarDevolucionTransaccionGateway(
+      idTransaccionGateway,
+      URL
+    );
+  } catch (error) {
+    controladorEventos.registrarError(error.message);
+    throw new Error(error.message);
+  }
 };
-comunicacionTransaccionRed = async (req) => {
-    const RECURSO = 'Transacciones';
-    const VERBO = 'POST';
-    let URL = await buscarURLRed(red, RECURSO, VERBO);
-    let respuesta = await controladorPeticiones.enviarTransaccionRed(req, URL);
-    return respuesta;
+comunicacionDevolucionTransaccionRed = async () => {
+  let URL;
+  const RECURSO = "Transacciones/Devoluciones";
+  const VERBO = "PUT";
+  try {
+    await consultarIDTransaccionRed();
+  } catch (error) {
+    controladorEventos.registrarError(error.message);
+    throw new Error(error.message);
+  }
+  try {
+    URL = await buscarURLAplicativo(red, RECURSO, VERBO);
+    await controladorPeticiones.enviarDevolucionTransaccionGateway(
+      idTransaccionRed,
+      URL
+    );
+  } catch (error) {
+    controladorEventos.registrarError(error.message);
+    throw new Error(error.message);
+  }
 };
-revertirTransaccionRed = async () => {
-    const RECURSO = 'Transacciones';
-    const VERBO = 'DELETE';
-    let URL = await buscarURLRed(red, RECURSO, VERBO);
-    let respuesta = await controladorPeticiones.revertirTransaccionRed(idTransaccionRed, URL);
-    return respuesta;
-};
-buscarURLRed = async (nombreRed, recurso, verbo) => {
-    let URL = await controladorPersistencia.buscarURLRed(nombreRed, recurso, verbo);
-    return URL;
-};
-comunicacionTransaccionEmisor = async (req) => {
-    const RECURSO = 'Transacciones';
-    const VERBO = 'POST';
-    let URL = await buscarURLEmisor(emisor, RECURSO, VERBO);
-    let respuesta = await controladorPeticiones.enviarTransaccionEmisor(req, URL);
-    return respuesta;
-};
-revertirTransaccionEmisor = async () => {
-    const RECURSO = 'Transacciones';
-    const VERBO = 'DELETE';
-    let URL = await buscarURLEmisor(emisor, RECURSO, VERBO);
-    let respuesta = await controladorPeticiones.revertirTransaccionEmisor(idTransaccionEmisor, URL);
-    return respuesta;
-};
-buscarURLEmisor = async (nombreEmisor, recurso, verbo) => {
-    let URL = await controladorPersistencia.buscarURLEmisor(nombreEmisor, recurso, verbo);
-    return URL;
-};
-
-/*
-comunicacionTransaccionEmisor = async (req) => {
-    let respuesta = await controladorPeticiones.enviarTransaccionEmisor(req);
-    return respuesta;
-}; 
-revertirTransaccionEmisor = async () => {
-    let respuesta = await controladorPeticiones.revertirTransaccionEmisor(idTransaccionEmisor);
-    return respuesta;
-};
-*/
-guardarTransaccion = async (req) => {
-    req.body.idTransaccionGate = idTransaccionGateway;
-    req.body.idTransaccionRed = idTransaccionRed;
-    req.body.idTransaccionEmisor = idTransaccionEmisor;
-    let idTransaccion = await controladorPersistencia.guardarTransaccion(req);
-    return idTransaccion;
-}; 
-revertirTransaccion = async (idTransaccionEliminarTePagoYa) => {
-    let idTransaccion = await controladorPersistencia.eliminarTransaccion(idTransaccionEliminarTePagoYa);
-    return idTransaccion;
-}; 
-exports.ComunicacionDevolucion = async (req) => {
-    idTransaccionTePagoYa = req.body.idTransaccion;
-    await comunicacionDevolucionTransaccionGateway();
-    await comunicacionDevolucionTransaccionRed();
-    await comunicacionDevolucionTransaccionEmisor();
-    try {
-        await controladorPersistencia.realizarDevolucionTransaccion(idTransaccionTePagoYa);
-    } catch(error) {
-        throw new Error(error.respuesta);
-    }
-    return idTransaccionTePagoYa;
- };
- comunicacionDevolucionTransaccionGateway = async () => {
-    try { 
-        await consultarIDTransaccionGateway();
-    } catch (error){
-        throw new Error(error.message);
-    }
-    try {
-        await controladorPeticiones.enviarDevolucionTransaccionGateway(idTransaccionGateway);
-    } catch (error){
-        throw new Error(error.message);
-    }   
- };
- comunicacionDevolucionTransaccionRed = async () => {
-    try { 
-        await consultarIDTransaccionRed();
-    } catch (error){
-        throw new Error(error.message);
-    }
-    try {
-        await controladorPeticiones.enviarDevolucionTransaccionRed(idTransaccionRed);
-    } catch (error){
-        throw new Error(error.message); 
-    }    
- };
 comunicacionDevolucionTransaccionEmisor = async () => {
-    try { 
-        await consultarIDTransaccionEmisor();
-    } catch (error){
-        throw new Error(error.message);
-    }
-    try{
-        await controladorPeticiones.enviarDevolucionTransaccionEmisor(idTransaccionEmisor);
-    } catch (error) {
-        throw new Error(error.message);
-    }
-};
- consultarIDTransaccionEmisor = async () => {
-     idTransaccionEmisor = await controladorPersistencia.consultarIDTransaccionEmisor(idTransaccionTePagoYa); 
-};
-consultarIDTransaccionRed = async () => {
-    idTransaccionRed = await controladorPersistencia.consultarIDTransaccionRed(idTransaccionTePagoYa);
+  let URL;
+  const RECURSO = "Transacciones/Devoluciones";
+  const VERBO = "PUT";
+  try {
+    await consultarIDTransaccionEmisor();
+  } catch (error) {
+    controladorEventos.registrarError(error.message);
+    throw new Error(error.message);
+  }
+  try {
+    URL = await buscarURLAplicativo(emisor, RECURSO, VERBO);
+    await controladorPeticiones.enviarDevolucionTransaccionGateway(
+      idTransaccionEmisor,
+      URL
+    );
+  } catch (error) {
+    controladorEventos.registrarError(error.message);
+    throw new Error(error.message);
+  }
 };
 consultarIDTransaccionGateway = async () => {
-    idTransaccionGateway = await controladorPersistencia.consultarIDTransaccionGateway(idTransaccionTePagoYa);
+  idTransaccionGateway = await controladorPersistencia.consultarIDTransaccionGateway(
+    idTransaccionTePagoYa
+  );
 };
-
-exports.comunicacionChargeBack =  async (req) => {
-    idTransaccionTePagoYa = req.body.idTransaccion;
-    try { 
-        await consultarIDTransaccionGateway();
-    } catch (error){
-        throw new Error(error.message);
-    }
-    try { 
-        await consultarIDTransaccionRed();
-    } catch (error){
-        throw new Error(error.message);
-    }
-    try { 
-        await consultarIDTransaccionEmisor();
-    } catch (error){
-        throw new Error(error.message);
-    }
-    try {
-        await comunicacionChargeBackGateway();
-    } catch(error){
-        throw new Error(error.respuesta);
-    }
-    try {
-        await comunicacionChargeBackRed();
-    } catch(error){
-        throw new Error(error.respuesta);
-    }
-    try {
-        await comunicacionChargeBackComercio();
-    } catch(error){
-        throw new Error(error.respuesta);
-    }
-    try {
-        await controladorPersistencia.realizarChargeBack(idTransaccionTePagoYa);
-    } catch(error) {
-        throw new Error(error.respuesta);
-    }
-    
-    return idTransaccionEmisor;
-}
-comunicacionChargeBackGateway= async (req) => {
-    await controladorPeticiones.enviarChargeBackGateway(idTransaccionGateway);
+consultarIDTransaccionRed = async () => {
+  idTransaccionRed = await controladorPersistencia.consultarIDTransaccionRed(
+    idTransaccionTePagoYa
+  );
 };
-comunicacionChargeBackRed= async (req) => {
-    await controladorPeticiones.enviarChargeBackRed(idTransaccionRed);
+consultarIDTransaccionEmisor = async () => {
+  idTransaccionEmisor = await controladorPersistencia.consultarIDTransaccionEmisor(
+    idTransaccionTePagoYa
+  );
 };
-comunicacionChargeBackComercio= async (req) => {
-    await controladorPeticiones.comunicacionChargeBackComercio(idTransaccionTePagoYa);
+exports.comunicacionChargeBack = async req => {
+  let idChargeBack;
+  idTransaccionTePagoYa = req.body.idTransaccion;
+  await buscarAplicativos();
+  await comunicacionChargeBackGateway();
+  await comunicacionChargeBackRed();
+  await comunicacionChargeBackComercio();
+  await consultarIDTransaccionEmisor();
+  try {
+    idChargeBack = await controladorPersistencia.realizarChargeBack(
+      idTransaccionTePagoYa
+    );
+    controladorEventos.registrarLog("IDTransaccion chargeBack:" + idChargeBack);
+  } catch (error) {
+    controladorEventos.registrarError(error.message);
+    throw new Error(error.respuesta);
+  }
+  return idTransaccionEmisor;
 };
-exports.comunicacionCierreLotes= async (req) => {
-    const RECURSO = 'Transacciones/CierreLotes';
-    const VERBO = 'GET';
-    let URL = await buscarURLGateway(req.query.gateway, RECURSO, VERBO);
-    let respuesta = await controladorPeticiones.comunicacionCierreLotes(req, URL);
+comunicacionChargeBackGateway = async req => {
+  try {
+    let URL;
+    const RECURSO = "Transacciones/ChargeBacks";
+    const VERBO = "PUT";
+    URL = await buscarURLAplicativo(gateway, RECURSO, VERBO);
+    await consultarIDTransaccionGateway();
+    await controladorPeticiones.enviarChargeBackGateway(
+      idTransaccionGateway,
+      URL
+    );
+  } catch (error) {
+    controladorEventos.registrarError(error.message);
+    throw new Error(error.message);
+  }
+};
+comunicacionChargeBackRed = async req => {
+  try {
+    let URL;
+    const RECURSO = "Transacciones/ChargeBacks";
+    const VERBO = "PUT";
+    URL = await buscarURLAplicativo(red, RECURSO, VERBO);
+    await consultarIDTransaccionRed();
+    await controladorPeticiones.enviarChargeBackGateway(idTransaccionRed, URL);
+  } catch (error) {
+    controladorEventos.registrarError(error.message);
+    throw new Error(error.message);
+  }
+};
+comunicacionChargeBackComercio = async req => {
+  try {
+    let URL;
+    const RECURSO = "Transacciones/ChargeBacks";
+    const VERBO = "PUT";
+    URL = await buscarURLAplicativo(comercio, RECURSO, VERBO);
+    await controladorPeticiones.enviarChargeBackComercio(
+      idTransaccionTePagoYa,
+      URL
+    );
+  } catch (error) {
+    controladorEventos.registrarError(error.message);
+    throw new Error(error.message);
+  }
+};
+exports.comunicacionCierreLotes = async req => {
+  try {
+    let URL;
+    let respuesta;
+    let gateway = req.query.gateway;
+    const RECURSO = "Transacciones/CierreLotes";
+    const VERBO = "GET";
+    URL = await buscarURLAplicativo(gateway, RECURSO, VERBO);
+    respuesta = await controladorPeticiones.comunicacionCierreLotes(req, URL);
     return respuesta;
+  } catch (error) {
+    controladorEventos.registrarError(error.message);
+    throw new Error(error.message);
+  }
 };
-/*
-exports.loginAutenticacion = async () => {
-    try {
-        let respuesta = await controladorPeticiones.loginAutenticacion();
-        configAutenticacion.TOKEN = respuesta.data.token;
-        if(!respuesta.data.auth) {
-            throw new Error('Usuario no autenticado')
-        } else {
-            console.log('Autenticación exitosa');
-        }
-    }
-    catch(error) {
-        console.log(error.message);
-    } 
+buscarAplicativos = async () => {
+  try {
+    let aplicativos;
+    aplicativos = await controladorPersistencia.buscarAplicativos(
+      idTransaccionTePagoYa
+    );
+    gateway = aplicativos.gateway;
+    red = aplicativos.red;
+    emisor = aplicativos.emisor;
+    comercio = aplicativos.comercio;
+  } catch (error) {
+    controladorEventos.registrarError(error.message);
+    throw new Error(error.message);
+  }
 };
-
-validacionAutenticacion = async (req) => {
-    let respuesta = await controladorPeticiones.validacionAutenticacion(req);
-    if (!respuesta.auth) {
-        throw new Error(respuesta.message);
-    }
-}
-
-
-
-exports.comunicacionRevertirTransaccion = async (req) => {
-    idTransaccionTePagoYa = req.params.id;
-    try{
-        let respuesta = await comunicacionRevertirTransaccionEmisor(req);
-        idTransaccionEmisor = respuesta;
-    }catch(error){
-        console.log(error.respuesta);
-        throw new Error(error.respuesta);
-    }
-    try{
-        let respuesta = await comunicacionRevertirTransaccionRed(req);
-        idTransaccionRed=respuesta;
-    }catch(error){
-        console.log(error.respuesta);
-        throw new Error(error.respuesta);
-    }
-    try{
-        let respuesta = await comunicacionRevertirTransaccionGateway(req);
-        idTransaccionGateway=respuesta;
-    }catch(error){
-        throw new Error(error.respuesta);
-    }
-    return idTransaccionTePagoYa;
-};  
-
-comunicacionRevertirTransaccionEmisor= async (req) => {
-    await consultarIDTransaccionEmisor(idTransaccionTePagoYa);
-    let respuesta= await revertirTransaccionEmisor(idTransaccionEmisor);
-    return respuesta;
+crearTransaccionTePagoYa = cuerpoSolicitudInicial => {
+  cuerpoSolicitudInicial.gateway = gateway;
+  cuerpoSolicitudInicial.idTransaccionGateway = idTransaccionGateway;
+  cuerpoSolicitudInicial.red = red;
+  cuerpoSolicitudInicial.idTransaccionRed = idTransaccionRed;
+  cuerpoSolicitudInicial.emisor = emisor;
+  cuerpoSolicitudInicial.idTransaccionEmisor = idTransaccionEmisor;
+  return cuerpoSolicitudInicial;
 };
-comunicacionRevertirTransaccionRed= async (req) => {
-    await consultarIDTransaccionRed(idTransaccionTePagoYa);
-    let respuesta= await revertirTransaccionRed(idTransaccionRed);
-    return respuesta;
+crearCuerpoTransaccionGateway = async cuerpoSolicitudInicial => {
+  let prefijoTarjeta;
+  let transaccionEnviar;
+  prefijoTarjeta = cuerpoSolicitudInicial.tarjeta.numero
+    .toString()
+    .substring(0, 1);
+  prefijoTarjeta = parseInt(prefijoTarjeta);
+  transaccionEnviar = {
+    monto: cuerpoSolicitudInicial.monto,
+    fechaTransaccion: cuerpoSolicitudInicial.fechaTransaccion,
+    prefijoTarjeta: prefijoTarjeta,
+    RUT: cuerpoSolicitudInicial.RUT
+  };
+  return transaccionEnviar;
 };
-comunicacionRevertirTransaccionGateway= async (req) => {
-    await consultaridTransaccionGateway(idTransaccionTePagoYa);
-    let nombreGate = await buscarNombreGateway(idTransaccionTePagoYa);
-    let respuesta = await revertirTransaccionGateway(nombreGate);
-    return respuesta;
+controlarFechaPeticion = async req => {
+  let mensajeError = "error en formato fecha";
+  let control;
+  try {
+    control = moment(req.body.fechaTransaccion).isValid();
+  } catch (error) {
+    controladorEventos.registrarError(mensajeError);
+    throw new Error(mensajeError);
+  }
+  if (!control) {
+    controladorEventos.registrarError(mensajeError);
+    throw new Error(mensajeError);
+  }
 };
-consultarIDTransaccionEmisor= async (idTransaccion) => {
-    idTransaccionEmisor = await controladorPersistencia.consultarIDTransaccionEmisor(idTransaccion);
+controlarCantidad = async req => {
+  let mensajeError;
+  if (isNaN(req.body.monto)) {
+    mensajeError = "el monto no puede ser texto";
+    controladorEventos.registrarError(mensajeError);
+    throw new Error(mensajeError);
+  }
+  console.log(req.body.monto);
+  if (req.body.monto < 1) {
+    mensajeError = "el monto no puede ser un valor negativo";
+    controladorEventos.registrarError(mensajeError);
+    throw new Error(mensajeError);
+  }
 };
-consultarIDTransaccionRed= async (idTransaccion) => {
-    idTransaccionRed = await controladorPersistencia.consultarIDTransaccionRed(idTransaccion);
-};
-consultaridTransaccionGateway= async (idTransaccion) => {
-    idTransaccionGateway = await controladorPersistencia.consultaridTransaccionGateway(idTransaccion);
-};
-buscarNombreGateway = async (idTransaccion) => {
-    let gateway = await controladorPersistencia.buscarNombreGateway(idTransaccion);
-    return gateway;
-};
-exports.comunicacionChargeBack =  async (req) => {
-    try {
-        let respuesta = await comunicacionChargeBackEmisor(req);
-        idTransaccionEmisor=respuesta;
-    } catch(error){
-        console.log(error.respuesta);
-        throw new Error(error.respuesta);
-    }
-}
-comunicacionChargeBackEmisor= async (req) => {
-    idTransaccionEmisor = await controladorPersistencia.consultarIDTransaccionEmisor(req.body.idTransaccion);
-    let respuesta = await controladorPeticiones.enviarChargeBackEmisor(idTransaccionEmisor);
-    return respuesta;
-};
-*/

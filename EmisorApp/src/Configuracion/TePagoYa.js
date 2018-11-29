@@ -1,3 +1,3 @@
 module.exports = {
-    URLCHARGEBACK : 'http://localhost:9000/ChargeBacks'
-}
+  URLCHARGEBACK: "http://localhost:9000/Transacciones/ChargeBacks"
+};

@@ -1,8 +1,6 @@
-let controladorApp =  require("./src/Controladores/ControladorApp");
+let controladorApp = require("./src/Controladores/controladorApp");
 try {
-    controladorApp.inicializarApp();
+  controladorApp.inicializarApp();
 } catch (error) {
-    throw new Error (error.message);
+  throw new Error(error.message);
 }
-
-
