@@ -10,7 +10,6 @@ exports.enviarTransaccionGateway = async (transaccionAEnviar, URL) => {
     throw new Error("Error al realizar la peticion a: " + URL);
   }
 };
-
 exports.enviarDevolucionTransaccionGateway = async (idTransaccion, URL) => {
   let header = { headers: { token: configAutenticacion.TOKEN } };
   let devolucionTransaccionEnviar = { idTransaccion: idTransaccion };
